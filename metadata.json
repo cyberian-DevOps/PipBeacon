@@ -1,0 +1,6 @@
+{
+  "name": "PipBeacon: Forex & Crypto",
+  "description": "Professional forex and crypto market intelligence, trading signals, technical analysis indicators, and market monitoring with zero billable infrastructure.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
