@@ -97,24 +97,24 @@ fun SignalHistoryScreen(
         }
     }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("signal_history_screen"),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+    com.pipbeacon.app.ui.components.ShowcaseBackground(
+        modifier = modifier.testTag("signal_history_screen")
     ) {
-        // Mandatory Compliance & Risk Warning Banner
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF1E1E12))
-                    .border(1.dp, IndicatorNeutral.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                    .padding(14.dp)
-            ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Mandatory Compliance & Risk Warning Banner
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(com.pipbeacon.app.ui.theme.IndicatorNeutralBackground)
+                        .border(1.dp, IndicatorNeutral.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                        .padding(14.dp)
+                ) {
                 Row(verticalAlignment = Alignment.Top) {
                     Icon(
                         imageVector = Icons.Default.Warning,
@@ -247,11 +247,12 @@ fun SignalHistoryScreen(
                 }
             }
         } else {
-            items(filteredList) { sig ->
-                HistoricalSignalCard(
-                    signal = sig,
-                    onClick = { inspectedSignal = sig }
-                )
+                items(filteredList) { sig ->
+                    HistoricalSignalCard(
+                        signal = sig,
+                        onClick = { inspectedSignal = sig }
+                    )
+                }
             }
         }
     }

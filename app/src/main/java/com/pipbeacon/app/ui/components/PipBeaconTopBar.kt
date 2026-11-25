@@ -1,8 +1,9 @@
 package com.pipbeacon.app.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,15 +32,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pipbeacon.app.core.Constants
 import com.pipbeacon.app.core.DataResult
+import com.pipbeacon.app.ui.theme.CyanAccent
+import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorBuy
 import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.NavyBorder
-import com.pipbeacon.app.ui.theme.NavyCard
 import com.pipbeacon.app.ui.theme.NavySurface
 import com.pipbeacon.app.ui.theme.NavySurfaceVariant
-import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
 
@@ -53,51 +53,49 @@ fun PipBeaconTopBar(
     onToggleTheme: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(NavySurface)
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Beacon Logo Icon
+            // Showcase Golden Lighthouse Emblem
             Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(11.dp))
                     .background(NavySurfaceVariant)
-                    .padding(4.dp),
+                    .border(1.dp, GoldAccentBright.copy(alpha = 0.45f), RoundedCornerShape(11.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Radar,
-                    contentDescription = "PipBeacon Logo",
-                    tint = com.pipbeacon.app.ui.theme.GoldAccentBright,
-                    modifier = Modifier.size(22.dp)
+                PipBeaconLighthouseArt(
+                    modifier = Modifier.size(32.dp),
+                    showCandles = false
                 )
             }
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            // Title & Status
-            androidx.compose.foundation.layout.Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val (statusColor, statusText) = when (providerStatus) {
-                        is DataResult.Success -> Pair(IndicatorBuy, "Live Data Active")
-                        is DataResult.WaitingForProvider -> Pair(IndicatorNeutral, "Waiting for provider")
-                        is DataResult.Loading -> Pair(TealAccent, "Connecting...")
-                        is DataResult.Error -> Pair(IndicatorNeutral, "Data disconnected")
+                        is DataResult.Success -> Pair(IndicatorBuy, "Live / Demo Active")
+                        is DataResult.WaitingForProvider -> Pair(IndicatorNeutral, "Offline Demo Mode")
+                        is DataResult.Loading -> Pair(CyanAccent, "Syncing Feeds...")
+                        is DataResult.Error -> Pair(IndicatorNeutral, "Offline Fallback")
                     }
                     Box(
                         modifier = Modifier
@@ -115,15 +113,14 @@ fun PipBeaconTopBar(
                 }
             }
 
-            // Quick Actions: Theme Toggle, Pip Calculator & Refresh
             IconButton(
                 onClick = onToggleTheme,
                 modifier = Modifier.testTag("top_bar_theme_toggle_button")
             ) {
                 Icon(
-                    imageVector = if (isDarkTheme) androidx.compose.material.icons.Icons.Default.LightMode else androidx.compose.material.icons.Icons.Default.DarkMode,
+                    imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
                     contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode",
-                    tint = if (isDarkTheme) com.pipbeacon.app.ui.theme.GoldAccentBright else Color(0xFF818CF8)
+                    tint = if (isDarkTheme) GoldAccentBright else Color(0xFF4F46E5)
                 )
             }
 
@@ -132,9 +129,9 @@ fun PipBeaconTopBar(
                 modifier = Modifier.testTag("top_bar_calculator_button")
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Calculate,
-                    contentDescription = "Pip Calculator",
-                    tint = TealAccent
+                    imageVector = Icons.Default.Calculate,
+                    contentDescription = "Trading Calculators",
+                    tint = CyanAccent
                 )
             }
 
@@ -143,11 +140,12 @@ fun PipBeaconTopBar(
                 modifier = Modifier.testTag("top_bar_refresh_button")
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Refresh,
+                    imageVector = Icons.Default.Refresh,
                     contentDescription = "Refresh Data",
                     tint = TextSecondary
                 )
             }
         }
+        HorizontalDivider(color = NavyBorder.copy(alpha = 0.7f), thickness = 1.dp)
     }
 }

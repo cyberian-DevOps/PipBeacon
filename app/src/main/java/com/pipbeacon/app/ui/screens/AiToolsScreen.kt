@@ -35,9 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pipbeacon.app.data.ai.AiTradingService
+import com.pipbeacon.app.ui.components.ShowcaseBackground
 import com.pipbeacon.app.ui.theme.GoldAccentBright
-import com.pipbeacon.app.ui.theme.NavyBackground
 import com.pipbeacon.app.ui.theme.NavyBorder
+import com.pipbeacon.app.ui.theme.NavyCardElevated
 import com.pipbeacon.app.ui.theme.NavySurface
 import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextMuted
@@ -52,12 +53,10 @@ fun AiToolsScreen(
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("ai_tools_screen")
-    ) {
+    ShowcaseBackground(modifier = Modifier.testTag("ai_tools_screen")) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
         // Tab Selector Row
         Row(
             modifier = Modifier
@@ -91,6 +90,7 @@ fun AiToolsScreen(
                 "NEWS" -> AiNewsAnalyzerScreen(onBack = onBack, aiService = aiService)
             }
         }
+        }
     }
 }
 
@@ -105,7 +105,7 @@ private fun AiTabItem(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) Color(0xFF242C3E) else Color.Transparent)
+            .background(if (isSelected) NavyCardElevated else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center

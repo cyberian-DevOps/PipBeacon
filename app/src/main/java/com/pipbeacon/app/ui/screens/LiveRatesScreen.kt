@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,10 +30,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CandlestickChart
 import androidx.compose.material.icons.filled.CheckCircle
@@ -45,22 +44,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,8 +63,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -81,16 +73,22 @@ import androidx.compose.ui.unit.sp
 import com.pipbeacon.app.core.DataResult
 import com.pipbeacon.app.core.MarketType
 import com.pipbeacon.app.data.MarketItem
+import com.pipbeacon.app.ui.components.ShowcaseBackground
+import com.pipbeacon.app.ui.components.ShowcaseGoldButton
+import com.pipbeacon.app.ui.components.ShowcaseSparkline
+import com.pipbeacon.app.ui.theme.CyanAccent
 import com.pipbeacon.app.ui.theme.GoldAccent
 import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorBuy
+import com.pipbeacon.app.ui.theme.IndicatorBuyBackground
 import com.pipbeacon.app.ui.theme.IndicatorSell
-import com.pipbeacon.app.ui.theme.NavyBackground
+import com.pipbeacon.app.ui.theme.IndicatorSellBackground
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
+import com.pipbeacon.app.ui.theme.NavyCardElevated
 import com.pipbeacon.app.ui.theme.NavySurface
 import com.pipbeacon.app.ui.theme.NavySurfaceVariant
-import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextMuted
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
@@ -120,7 +118,6 @@ fun LiveRatesScreen(
     var selectedItemForDetail by remember { mutableStateOf<MarketItem?>(null) }
     var isSearchVisible by remember { mutableStateOf(false) }
 
-    // Pulsing animation for live status dot
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
@@ -132,348 +129,355 @@ fun LiveRatesScreen(
         label = "pulseAlpha"
     )
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("live_rates_screen")
-    ) {
-        // Top Header
-        Surface(
-            color = NavySurface,
-            tonalElevation = 2.dp,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+    ShowcaseBackground(modifier = modifier.testTag("live_rates_screen")) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Showcase Markets Header
+            Surface(
+                color = NavySurface,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Markets",
+                                    color = TextPrimary,
+                                    fontSize = 21.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(IndicatorBuy.copy(alpha = pulseAlpha))
+                                )
+                            }
                             Text(
-                                text = "Live Market Rates",
-                                color = TextPrimary,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(IndicatorBuy.copy(alpha = pulseAlpha))
+                                text = "Live & Demonstration Forex & Crypto Quotes",
+                                color = TextSecondary,
+                                fontSize = 11.sp
                             )
                         }
-                        Text(
-                            text = "Real-time Forex & Crypto pricing",
-                            color = TextSecondary,
-                            fontSize = 12.sp
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { isSearchVisible = !isSearchVisible },
+                                modifier = Modifier.testTag("toggle_rates_search")
+                            ) {
+                                Icon(
+                                    imageVector = if (isSearchVisible) Icons.Default.Close else Icons.Default.Search,
+                                    contentDescription = "Search",
+                                    tint = if (isSearchVisible) GoldAccentBright else TextSecondary
+                                )
+                            }
+
+                            IconButton(
+                                onClick = onRefresh,
+                                enabled = !uiState.isRefreshing,
+                                modifier = Modifier.testTag("refresh_live_rates_button")
+                            ) {
+                                if (uiState.isRefreshing) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp,
+                                        color = GoldAccentBright
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "Refresh",
+                                        tint = CyanAccent
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    AnimatedVisibility(visible = isSearchVisible) {
+                        OutlinedTextField(
+                            value = uiState.searchQuery,
+                            onValueChange = onSearchChanged,
+                            placeholder = {
+                                Text(
+                                    "Search by symbol (e.g. BTC, EUR, SOL)...",
+                                    color = TextMuted,
+                                    fontSize = 13.sp
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .testTag("rates_search_input"),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = GoldAccentBright,
+                                unfocusedBorderColor = NavyBorder,
+                                focusedTextColor = TextPrimary,
+                                unfocusedTextColor = TextPrimary,
+                                cursorColor = GoldAccentBright,
+                                focusedContainerColor = NavyCard,
+                                unfocusedContainerColor = NavyCard
+                            )
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(
-                            onClick = { isSearchVisible = !isSearchVisible },
-                            modifier = Modifier.testTag("toggle_rates_search")
-                        ) {
-                            Icon(
-                                imageVector = if (isSearchVisible) Icons.Default.Close else Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = if (isSearchVisible) GoldAccentBright else TextSecondary
-                            )
-                        }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                        IconButton(
-                            onClick = onRefresh,
-                            enabled = !uiState.isRefreshing,
-                            modifier = Modifier.testTag("refresh_live_rates_button")
-                        ) {
-                            if (uiState.isRefreshing) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp,
-                                    color = TealAccent
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Refresh",
-                                    tint = TealAccent
+                    // Showcase Segmented Pill Switcher: All | Forex | Crypto
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(NavyCard)
+                            .border(1.dp, NavyBorder, RoundedCornerShape(24.dp))
+                            .padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        val primaryTabs = listOf(
+                            LiveRateTab.ALL to "All Pairs",
+                            LiveRateTab.FOREX to "Forex",
+                            LiveRateTab.CRYPTO to "Crypto"
+                        )
+                        primaryTabs.forEach { (tab, label) ->
+                            val isSelected = uiState.liveRateTab == tab ||
+                                (tab == LiveRateTab.FOREX && uiState.liveRateTab in listOf(
+                                    LiveRateTab.MAJORS,
+                                    LiveRateTab.MINORS,
+                                    LiveRateTab.METALS,
+                                    LiveRateTab.EXOTICS
+                                )) ||
+                                (tab == LiveRateTab.CRYPTO && uiState.liveRateTab in listOf(
+                                    LiveRateTab.LAYER1,
+                                    LiveRateTab.DEFI,
+                                    LiveRateTab.MEMES
+                                ))
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(if (isSelected) GoldAccentBright else Color.Transparent)
+                                    .clickable { onTabSelected(tab) }
+                                    .padding(vertical = 8.dp)
+                                    .testTag("tab_${tab.name.lowercase()}"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = label,
+                                    color = if (isSelected) Color(0xFF060D1A) else TextSecondary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
                     }
-                }
 
-                // Collapsible Search Input
-                AnimatedVisibility(visible = isSearchVisible) {
-                    OutlinedTextField(
-                        value = uiState.searchQuery,
-                        onValueChange = onSearchChanged,
-                        placeholder = { Text("Search by symbol (e.g. BTC, EUR, SOL)...", color = TextMuted, fontSize = 13.sp) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .testTag("rates_search_input"),
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GoldAccent,
-                            unfocusedBorderColor = NavyBorder,
-                            focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary,
-                            cursorColor = GoldAccent,
-                            focusedContainerColor = NavyCard,
-                            unfocusedContainerColor = NavyCard
-                        )
-                    )
-                }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Provider Status & Auto-refresh status bar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    // Provider status & auto refresh bar
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = IndicatorBuy,
-                            modifier = Modifier.size(13.dp)
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        val formattedTime = lastRefreshTime?.let {
-                            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(it))
-                        } ?: "Offline Ready"
-                        val feedLabel = if (providerStatus is DataResult.Success) {
-                            "Live & Demo Feeds • $formattedTime"
-                        } else {
-                            "Demonstration Market Data (Offline Ready)"
-                        }
-                        Text(
-                            text = feedLabel,
-                            color = TextMuted,
-                            fontSize = 11.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    // Auto-refresh chip
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(if (uiState.isAutoRefreshActive) GoldAccent.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.05f))
-                            .border(
-                                1.dp,
-                                if (uiState.isAutoRefreshActive) GoldAccent.copy(alpha = 0.5f) else NavyBorder,
-                                RoundedCornerShape(6.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = IndicatorBuy,
+                                modifier = Modifier.size(13.dp)
                             )
-                            .clickable { onToggleAutoRefresh() }
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
-                    ) {
-                        Text(
-                            text = if (uiState.isAutoRefreshActive) "Auto: 15s ON" else "Auto: PAUSED",
-                            color = if (uiState.isAutoRefreshActive) GoldAccentBright else TextMuted,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            val formattedTime = lastRefreshTime?.let {
+                                SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(it))
+                            } ?: "Offline Ready"
+                            val feedLabel = if (providerStatus is DataResult.Success) {
+                                "Live & Demo Feeds • $formattedTime"
+                            } else {
+                                "Demonstration Market Data (Offline Ready)"
+                            }
+                            Text(
+                                text = feedLabel,
+                                color = TextMuted,
+                                fontSize = 11.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (uiState.isAutoRefreshActive) GoldAccent.copy(alpha = 0.16f)
+                                    else NavyCard
+                                )
+                                .border(
+                                    1.dp,
+                                    if (uiState.isAutoRefreshActive) GoldAccent.copy(alpha = 0.5f) else NavyBorder,
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .clickable { onToggleAutoRefresh() }
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = if (uiState.isAutoRefreshActive) "Auto: 15s ON" else "Auto: PAUSED",
+                                color = if (uiState.isAutoRefreshActive) GoldAccentBright else TextMuted,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        // Category Tabs Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            LiveRateTab.entries.forEach { tab ->
-                val isSelected = uiState.liveRateTab == tab
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(if (isSelected) GoldAccent else NavyCard)
-                        .border(
-                            1.dp,
-                            if (isSelected) GoldAccent else NavyBorder,
-                            RoundedCornerShape(20.dp)
-                        )
-                        .clickable { onTabSelected(tab) }
-                        .padding(horizontal = 14.dp, vertical = 7.dp)
-                        .testTag("tab_${tab.name.lowercase()}")
-                ) {
-                    Text(
-                        text = tab.label,
-                        color = if (isSelected) Color.Black else TextSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                    )
-                }
+            // Secondary Category Filters Row (preserving all LiveRateTab test tags)
+            val secondaryTabs = LiveRateTab.entries.filter {
+                it !in listOf(LiveRateTab.ALL, LiveRateTab.FOREX, LiveRateTab.CRYPTO)
             }
-        }
-
-        // Sorting Chips Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Tune,
-                contentDescription = null,
-                tint = TextMuted,
-                modifier = Modifier.size(14.dp)
-            )
-            RateSortOption.entries.forEach { sort ->
-                val isSelected = uiState.sortOption == sort
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(if (isSelected) TealAccent.copy(alpha = 0.2f) else Color.Transparent)
-                        .border(
-                            1.dp,
-                            if (isSelected) TealAccent else NavyBorder.copy(alpha = 0.5f),
-                            RoundedCornerShape(6.dp)
-                        )
-                        .clickable { onSortSelected(sort) }
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = sort.label,
-                        color = if (isSelected) TealAccent else TextMuted,
-                        fontSize = 10.sp,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Column Headers Bar for Maximum Clarity
-        Surface(
-            color = NavySurfaceVariant,
-            modifier = Modifier.fillMaxWidth()
-        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "PAIR / ASSET",
-                    color = TextMuted,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.5f)
-                )
-                Text(
-                    text = "SPREAD",
-                    color = TextMuted,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(0.9f)
-                )
-                Text(
-                    text = "LIVE PRICE",
-                    color = TextMuted,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1.2f)
-                )
-                Text(
-                    text = "24H CHG",
-                    color = TextMuted,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1.1f)
-                )
-            }
-        }
-
-        // Market Rates List
-        if (liveRates.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = if (uiState.searchQuery.isNotBlank()) "No pairs match '${uiState.searchQuery}'" else "Fetching live market rates...",
-                        color = TextSecondary,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onRefresh,
-                        colors = ButtonDefaults.buttonColors(containerColor = GoldAccent)
+                secondaryTabs.forEach { tab ->
+                    val isSelected = uiState.liveRateTab == tab
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(if (isSelected) CyanAccent else NavyCard)
+                            .border(
+                                1.dp,
+                                if (isSelected) CyanAccent else NavyBorder,
+                                RoundedCornerShape(20.dp)
+                            )
+                            .clickable { onTabSelected(tab) }
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .testTag("tab_${tab.name.lowercase()}")
                     ) {
-                        Text("Refresh Feed", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = tab.label,
+                            color = if (isSelected) Color(0xFF060D1A) else TextSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                        )
                     }
                 }
             }
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.fillMaxSize()
+
+            // Sorting Chips Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Ticker summary stats banner
-                item {
-                    RatesOverviewBanner(liveRates = liveRates)
-                    Spacer(modifier = Modifier.height(4.dp))
+                Icon(
+                    imageVector = Icons.Default.Tune,
+                    contentDescription = null,
+                    tint = TextMuted,
+                    modifier = Modifier.size(14.dp)
+                )
+                RateSortOption.entries.forEach { sort ->
+                    val isSelected = uiState.sortOption == sort
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isSelected) CyanAccent.copy(alpha = 0.18f) else Color.Transparent)
+                            .border(
+                                1.dp,
+                                if (isSelected) CyanAccent else NavyBorder.copy(alpha = 0.6f),
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clickable { onSortSelected(sort) }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = sort.label,
+                            color = if (isSelected) CyanAccent else TextMuted,
+                            fontSize = 10.sp,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+                        )
+                    }
                 }
+            }
 
-                items(liveRates, key = { it.id }) { item ->
-                    LiveRateRow(
-                        item = item,
-                        onClick = { onNavigateToAnalysis(item.symbol) },
-                        onInfoClick = { selectedItemForDetail = item }
-                    )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            if (liveRates.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = TextMuted,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = if (uiState.searchQuery.isNotBlank()) "No pairs match '${uiState.searchQuery}'"
+                            else "Fetching market rates...",
+                            color = TextSecondary,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ShowcaseGoldButton(
+                            text = "Refresh Feed",
+                            onClick = onRefresh,
+                            height = 46.dp
+                        )
+                    }
                 }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        RatesOverviewBanner(liveRates = liveRates)
+                    }
 
-                item {
-                    Spacer(modifier = Modifier.height(30.dp))
+                    items(liveRates, key = { it.id }) { item ->
+                        LiveRateRow(
+                            item = item,
+                            onClick = { onNavigateToAnalysis(item.symbol) },
+                            onInfoClick = { selectedItemForDetail = item }
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
                 }
             }
         }
     }
 
-    // Modal Bottom Sheet for Rate Inspection
     selectedItemForDetail?.let { item ->
         RateDetailSheet(
             item = item,
@@ -500,156 +504,127 @@ fun LiveRateRow(
     val isPositive = (item.changePercent24h ?: 0.0) >= 0.0
     val changeColor = if (isPositive) IndicatorBuy else IndicatorSell
     val changeSign = if (isPositive) "+" else ""
+    val isCrypto = item.marketType == MarketType.CRYPTO
+    val badgeTint = if (isCrypto) GoldAccentBright else CyanAccent
 
     Surface(
         color = NavyCard,
-        shape = RoundedCornerShape(10.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, NavyBorder),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, NavyBorder),
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
             .testTag("rate_row_${item.symbol.replace('/', '_')}")
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 9.dp),
+                .padding(horizontal = 12.dp, vertical = 11.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Column 1: Asset Glyph + Symbol + Category (Weight 1.5)
+            // Left: Circular Currency/Crypto Badge + Symbol + Price
             Row(
-                modifier = Modifier.weight(1.5f),
+                modifier = Modifier.weight(1.35f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(28.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(
-                            if (item.marketType == MarketType.CRYPTO) GoldAccent.copy(alpha = 0.15f) else TealAccent.copy(alpha = 0.15f)
-                        ),
+                        .background(badgeTint.copy(alpha = 0.15f))
+                        .border(1.dp, badgeTint.copy(alpha = 0.4f), CircleShape)
+                        .clickable { onInfoClick() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (item.marketType == MarketType.CRYPTO) Icons.Default.CurrencyBitcoin else Icons.Default.CurrencyExchange,
-                        contentDescription = null,
-                        tint = if (item.marketType == MarketType.CRYPTO) GoldAccentBright else TealAccent,
-                        modifier = Modifier.size(15.dp)
+                        imageVector = if (isCrypto) Icons.Default.CurrencyBitcoin else Icons.Default.CurrencyExchange,
+                        contentDescription = "Inspect ${item.symbol}",
+                        tint = badgeTint,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 Column {
                     Text(
                         text = item.symbol,
                         color = TextPrimary,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
                         maxLines = 1
                     )
-                    Text(
-                        text = item.name,
-                        color = TextMuted,
-                        fontSize = 9.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-
-            // Column 2: Spread (Weight 0.9)
-            Box(
-                modifier = Modifier
-                    .weight(0.9f),
-                contentAlignment = Alignment.Center
-            ) {
-                val spreadStr = item.pipSpread?.let {
-                    if (item.marketType == MarketType.FOREX) {
-                        "${String.format(Locale.US, "%.1f", it)}p"
-                    } else {
-                        "0.02%"
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = formatPrice(item.currentPrice, item.symbol),
+                            color = TextSecondary,
+                            fontSize = 12.sp,
+                            fontFamily = JetBrainsMonoFont,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        val spreadStr = item.pipSpread?.let {
+                            if (item.marketType == MarketType.FOREX) "${String.format(Locale.US, "%.1f", it)}p" else "0.02%"
+                        } ?: "0.8p"
+                        Text(
+                            text = spreadStr,
+                            color = GoldAccentBright,
+                            fontSize = 9.sp,
+                            fontFamily = JetBrainsMonoFont,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                } ?: "0.8p"
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(NavySurfaceVariant)
-                        .border(1.dp, NavyBorder, RoundedCornerShape(4.dp))
-                        .padding(horizontal = 5.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = spreadStr,
-                        color = GoldAccentBright,
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.SemiBold
-                    )
                 }
             }
 
-            // Column 3: Live Price (Weight 1.2)
-            Column(
-                modifier = Modifier.weight(1.2f),
-                horizontalAlignment = Alignment.End
-            ) {
-                val priceStr = formatPrice(item.currentPrice, item.symbol)
-                Text(
-                    text = priceStr,
-                    color = TextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
-                    maxLines = 1
-                )
-                Text(
-                    text = "Tap for graph",
-                    color = TealAccent.copy(alpha = 0.7f),
-                    fontSize = 8.sp
-                )
-            }
+            // Center: Showcase Sparkline Trend Graph
+            ShowcaseSparkline(
+                points = item.sparkline,
+                isPositive = isPositive,
+                modifier = Modifier
+                    .weight(0.9f)
+                    .height(28.dp)
+                    .padding(horizontal = 6.dp)
+            )
 
-            // Column 4: 24h Change Pill + Mini Candlestick Icon (Weight 1.1)
+            // Right: Percentage Pill + Graph Action
             Row(
-                modifier = Modifier.weight(1.1f),
+                modifier = Modifier.weight(1.0f),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(changeColor.copy(alpha = 0.15f))
-                        .border(1.dp, changeColor.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (isPositive) IndicatorBuyBackground else IndicatorSellBackground)
+                        .border(1.dp, changeColor.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 7.dp, vertical = 4.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (isPositive) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
-                            contentDescription = null,
-                            tint = changeColor,
-                            modifier = Modifier.size(10.dp)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = "$changeSign${String.format(Locale.US, "%.2f", item.changePercent24h ?: 0.0)}%",
-                            color = changeColor,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
+                    Text(
+                        text = "$changeSign${String.format(Locale.US, "%.2f", item.changePercent24h ?: 0.0)}%",
+                        color = changeColor,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = JetBrainsMonoFont
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                Icon(
-                    imageVector = Icons.Default.CandlestickChart,
-                    contentDescription = "Graph",
-                    tint = TealAccent,
-                    modifier = Modifier.size(16.dp)
-                )
+                IconButton(
+                    onClick = onInfoClick,
+                    modifier = Modifier.size(30.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Details",
+                        tint = TextMuted,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
         }
     }
@@ -663,9 +638,9 @@ fun RatesOverviewBanner(liveRates: List<MarketItem>) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(NavyCard)
-            .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+            .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
             .padding(12.dp)
     ) {
         Row(
@@ -681,7 +656,7 @@ fun RatesOverviewBanner(liveRates: List<MarketItem>) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Educational Demonstration & Open Rates",
+                    text = "Educational Demonstration & Open Feeds",
                     color = TextMuted,
                     fontSize = 10.sp
                 )
@@ -697,7 +672,7 @@ fun RatesOverviewBanner(liveRates: List<MarketItem>) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$greenCount Advancing",
+                        text = "$greenCount Up",
                         color = IndicatorBuy,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold
@@ -713,7 +688,7 @@ fun RatesOverviewBanner(liveRates: List<MarketItem>) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$redCount Declining",
+                        text = "$redCount Down",
                         color = IndicatorSell,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold
@@ -735,42 +710,42 @@ fun LiveRateCard(
     val changeColor = if (isPositive) IndicatorBuy else IndicatorSell
     val changeSign = if (isPositive) "+" else ""
 
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
             .clickable { onClick() }
             .testTag("rate_card_${item.symbol.replace('/', '_')}"),
-        colors = CardDefaults.cardColors(containerColor = NavyCard),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        color = NavyCard,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, NavyBorder)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
-            // Header Row: Symbol, Category Badge, Price & 24h Change
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Type Badge Icon
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(CircleShape)
                             .background(
-                                if (item.marketType == MarketType.CRYPTO) GoldAccent.copy(alpha = 0.15f) else TealAccent.copy(alpha = 0.15f)
+                                if (item.marketType == MarketType.CRYPTO) GoldAccent.copy(alpha = 0.15f)
+                                else CyanAccent.copy(alpha = 0.15f)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = if (item.marketType == MarketType.CRYPTO) Icons.Default.CurrencyBitcoin else Icons.Default.CurrencyExchange,
+                            imageVector = if (item.marketType == MarketType.CRYPTO) Icons.Default.CurrencyBitcoin
+                            else Icons.Default.CurrencyExchange,
                             contentDescription = null,
-                            tint = if (item.marketType == MarketType.CRYPTO) GoldAccentBright else TealAccent,
+                            tint = if (item.marketType == MarketType.CRYPTO) GoldAccentBright else CyanAccent,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -783,14 +758,13 @@ fun LiveRateCard(
                                 text = item.symbol,
                                 color = TextPrimary,
                                 fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace
+                                fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(Color.White.copy(alpha = 0.06f))
+                                    .background(NavySurfaceVariant)
                                     .padding(horizontal = 5.dp, vertical = 2.dp)
                             ) {
                                 Text(
@@ -811,7 +785,6 @@ fun LiveRateCard(
                     }
                 }
 
-                // Price and Percentage
                 Column(horizontalAlignment = Alignment.End) {
                     val priceStr = formatPrice(item.currentPrice, item.symbol)
                     Text(
@@ -819,13 +792,13 @@ fun LiveRateCard(
                         color = TextPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(changeColor.copy(alpha = 0.15f))
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (isPositive) IndicatorBuyBackground else IndicatorSellBackground)
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -841,7 +814,7 @@ fun LiveRateCard(
                                 color = changeColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace
+                                fontFamily = JetBrainsMonoFont
                             )
                         }
                     }
@@ -850,17 +823,15 @@ fun LiveRateCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Sub-grid: 24h High/Low and Spread
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(NavySurfaceVariant)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .padding(horizontal = 10.dp, vertical = 7.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 24h Range
                 Column {
                     Text(
                         text = "24H RANGE",
@@ -872,11 +843,10 @@ fun LiveRateCard(
                         text = "L: ${formatPrice(item.low24h, item.symbol)} — H: ${formatPrice(item.high24h, item.symbol)}",
                         color = TextSecondary,
                         fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                 }
 
-                // Spread
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = if (item.marketType == MarketType.FOREX) "SPREAD" else "EST. SPREAD",
@@ -885,33 +855,27 @@ fun LiveRateCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     val spreadStr = item.pipSpread?.let {
-                        if (item.marketType == MarketType.FOREX) {
-                            "${String.format(Locale.US, "%.1f", it)} pips"
-                        } else {
-                            "0.02%"
-                        }
+                        if (item.marketType == MarketType.FOREX) "${String.format(Locale.US, "%.1f", it)} pips" else "0.02%"
                     } ?: "0.8 pips"
                     Text(
                         text = spreadStr,
                         color = GoldAccentBright,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Footer action buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Provider label
                 Text(
-                    text = item.providerName ?: if (item.marketType == MarketType.CRYPTO) "Binance API" else "Open Rates",
+                    text = item.providerName ?: if (item.marketType == MarketType.CRYPTO) "Open Crypto Feed" else "Open Rates",
                     color = TextMuted,
                     fontSize = 9.sp,
                     maxLines = 1,
@@ -920,55 +884,33 @@ fun LiveRateCard(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    // Calculator quick button
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color.White.copy(alpha = 0.05f))
-                            .border(1.dp, NavyBorder, RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(NavyCardElevated)
+                            .border(1.dp, NavyBorder, RoundedCornerShape(8.dp))
                             .clickable { onNavigateToCalculator() }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Calculate,
-                                contentDescription = null,
-                                tint = GoldAccentBright,
-                                modifier = Modifier.size(12.dp)
-                            )
+                            Icon(Icons.Default.Calculate, contentDescription = null, tint = GoldAccentBright, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(3.dp))
-                            Text(
-                                text = "Calc",
-                                color = TextSecondary,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                            Text("Calc", color = TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Medium)
                         }
                     }
 
-                    // Analysis quick button
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(TealAccent.copy(alpha = 0.12f))
-                            .border(1.dp, TealAccent.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(CyanAccent.copy(alpha = 0.14f))
+                            .border(1.dp, CyanAccent.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
                             .clickable { onNavigateToAnalysis() }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.CandlestickChart,
-                                contentDescription = null,
-                                tint = TealAccent,
-                                modifier = Modifier.size(12.dp)
-                            )
+                            Icon(Icons.Default.CandlestickChart, contentDescription = null, tint = CyanAccent, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(3.dp))
-                            Text(
-                                text = "Analyze",
-                                color = TealAccent,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text("Analyze", color = CyanAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -1000,7 +942,6 @@ fun RateDetailSheet(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            // Drag Bar
             Box(
                 modifier = Modifier
                     .size(width = 36.dp, height = 4.dp)
@@ -1011,7 +952,6 @@ fun RateDetailSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Header Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1023,13 +963,12 @@ fun RateDetailSheet(
                             text = item.symbol,
                             color = TextPrimary,
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
+                            fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(RoundedCornerShape(6.dp))
                                 .background(GoldAccent.copy(alpha = 0.2f))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
@@ -1041,11 +980,7 @@ fun RateDetailSheet(
                             )
                         }
                     }
-                    Text(
-                        text = item.name,
-                        color = TextSecondary,
-                        fontSize = 13.sp
-                    )
+                    Text(text = item.name, color = TextSecondary, fontSize = 13.sp)
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
@@ -1054,20 +989,30 @@ fun RateDetailSheet(
                         color = TextPrimary,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                     Text(
                         text = "${if (isPositive) "+" else ""}${String.format(Locale.US, "%.2f", item.changePercent24h ?: 0.0)}%",
                         color = changeColor,
                         fontSize = 12.sp,
+                        fontFamily = JetBrainsMonoFont,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // 24h Metrics Grid
+            ShowcaseSparkline(
+                points = item.sparkline,
+                isPositive = isPositive,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
                 text = "24-Hour Market Metrics",
                 color = TextPrimary,
@@ -1079,9 +1024,9 @@ fun RateDetailSheet(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(14.dp))
                     .background(NavyCard)
-                    .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+                    .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
                     .padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
@@ -1093,17 +1038,20 @@ fun RateDetailSheet(
                     value = item.pipSpread?.let { "${String.format(Locale.US, "%.1f", it)} pips" } ?: "0.8 pips",
                     valueColor = GoldAccentBright
                 )
-                DetailMetricRow("Signal Recommendation", item.signalSummary.name, valueColor = if (item.signalSummary.name.contains("BUY")) IndicatorBuy else IndicatorSell)
-                DetailMetricRow("Live Feed Provider", item.providerName ?: "Binance / Open Rates")
+                DetailMetricRow(
+                    "Technical Bias",
+                    item.signalSummary.name,
+                    valueColor = if (item.signalSummary.name.contains("BUY")) IndicatorBuy else IndicatorSell
+                )
+                DetailMetricRow("Feed Provider", item.providerName ?: "Demonstration / Open Feed")
                 val formattedTime = item.quoteTimestamp?.let {
                     SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(it))
-                } ?: "Real-Time"
+                } ?: "Demo Ready"
                 DetailMetricRow("Quote Timestamp", formattedTime)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -1112,25 +1060,23 @@ fun RateDetailSheet(
                     onClick = onNavigateToCalculator,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = NavyCard),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(GoldAccent))
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, SolidColor(GoldAccentBright))
                 ) {
                     Icon(Icons.Default.Calculate, contentDescription = null, tint = GoldAccentBright, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Calculator", color = GoldAccentBright, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
-                Button(
+                ShowcaseGoldButton(
+                    text = "Chart Analysis",
                     onClick = onNavigateToAnalysis,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent)
-                ) {
-                    Icon(Icons.Default.CandlestickChart, contentDescription = null, tint = Color.Black, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Technical View", color = Color.Black, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                }
+                    height = 48.dp,
+                    modifier = Modifier.weight(1.2f)
+                )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -1152,7 +1098,7 @@ fun DetailMetricRow(
             color = valueColor,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
+            fontFamily = JetBrainsMonoFont
         )
     }
 }
@@ -1161,12 +1107,10 @@ private fun formatPrice(price: Double?, symbol: String): String {
     if (price == null || price == 0.0) return "---"
     return when {
         symbol.contains("JPY") -> String.format(Locale.US, "%.3f", price)
-        symbol.contains("USDT") -> {
-            when {
-                price >= 1000.0 -> String.format(Locale.US, "$%,.2f", price)
-                price >= 1.0 -> String.format(Locale.US, "$%.4f", price)
-                else -> String.format(Locale.US, "$%.6f", price)
-            }
+        symbol.contains("USDT") -> when {
+            price >= 1000.0 -> String.format(Locale.US, "$%,.2f", price)
+            price >= 1.0 -> String.format(Locale.US, "$%.4f", price)
+            else -> String.format(Locale.US, "$%.6f", price)
         }
         else -> String.format(Locale.US, "%.5f", price)
     }

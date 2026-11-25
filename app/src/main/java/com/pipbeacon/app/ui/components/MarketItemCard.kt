@@ -1,5 +1,6 @@
 package com.pipbeacon.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,8 +15,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CurrencyBitcoin
+import androidx.compose.material.icons.filled.CurrencyExchange
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,18 +33,27 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pipbeacon.app.core.MarketType
 import com.pipbeacon.app.data.MarketItem
+import com.pipbeacon.app.ui.theme.CyanAccent
+import com.pipbeacon.app.ui.theme.GoldAccent
+import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorBuy
+import com.pipbeacon.app.ui.theme.IndicatorBuyBackground
 import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.IndicatorSell
+import com.pipbeacon.app.ui.theme.IndicatorSellBackground
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
-import com.pipbeacon.app.ui.theme.TealAccent
+import com.pipbeacon.app.ui.theme.NavySurfaceVariant
 import com.pipbeacon.app.ui.theme.TextMuted
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
+import java.util.Locale
 
 @Composable
 fun MarketItemCard(
@@ -45,93 +61,121 @@ fun MarketItemCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    val isCrypto = item.marketType == MarketType.CRYPTO
+    val badgeTint = if (isCrypto) GoldAccentBright else CyanAccent
+    val changePct = item.changePercent24h ?: 0.0
+    val isUp = changePct >= 0.0
+    val badgeColor = if (isUp) IndicatorBuy else IndicatorSell
+    val sign = if (isUp) "+" else ""
+
+    Surface(
+        color = NavyCard,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, NavyBorder),
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(NavyCard)
-            .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
             .testTag("market_item_${item.id}")
-            .padding(14.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.padding(14.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Symbol & Category
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = item.symbol,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1.1f)
+                ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color(0xFF1E293B))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(badgeTint.copy(alpha = 0.15f))
+                            .border(1.dp, badgeTint.copy(alpha = 0.4f), CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
+                        Icon(
+                            imageVector = if (isCrypto) Icons.Default.CurrencyBitcoin else Icons.Default.CurrencyExchange,
+                            contentDescription = null,
+                            tint = badgeTint,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = item.symbol,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .background(NavySurfaceVariant)
+                                    .border(1.dp, NavyBorder, RoundedCornerShape(5.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = item.category,
+                                    color = CyanAccent,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
                         Text(
-                            text = item.category,
-                            color = TealAccent,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold
+                            text = item.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                // Buy / Sell Quick Signal
                 SignalBadge(signal = item.signalSummary)
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = item.name,
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary
-            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Price section
                 Column {
                     if (item.isProviderLive && item.currentPrice != null) {
-                        val formattedPrice = if (item.currentPrice < 10) {
-                            String.format("%.4f", item.currentPrice)
-                        } else {
-                            String.format("%,.2f", item.currentPrice)
+                        val formattedPrice = when {
+                            item.currentPrice < 10 -> String.format(Locale.US, "%.4f", item.currentPrice)
+                            else -> String.format(Locale.US, "%,.2f", item.currentPrice)
                         }
                         Text(
                             text = formattedPrice,
-                            style = MaterialTheme.typography.labelMedium,
+                            fontFamily = JetBrainsMonoFont,
                             fontSize = 17.sp,
                             color = TextPrimary,
                             fontWeight = FontWeight.Bold
                         )
                         if (item.pipSpread != null) {
                             Text(
-                                text = "Spread: ${String.format("%.1f", item.pipSpread)} pips",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = TextMuted,
-                                fontSize = 10.sp
+                                text = "Spread: ${String.format(Locale.US, "%.1f", item.pipSpread)} pips",
+                                fontSize = 10.sp,
+                                color = TextMuted
                             )
                         }
                     } else {
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFF1B2333))
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(NavySurfaceVariant)
+                                .border(1.dp, NavyBorder, RoundedCornerShape(6.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
@@ -147,33 +191,32 @@ fun MarketItemCard(
                 // 24h change & Sparkline
                 if (item.isProviderLive && item.changePercent24h != null) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (item.sparkline.isNotEmpty()) {
-                            SparklinePreview(
-                                points = item.sparkline,
-                                isPositive = item.changePercent24h >= 0,
-                                modifier = Modifier
-                                    .width(60.dp)
-                                    .height(26.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-
-                        val isUp = item.changePercent24h >= 0
-                        val badgeColor = if (isUp) IndicatorBuy else IndicatorSell
-                        val sign = if (isUp) "+" else ""
-
-                        Text(
-                            text = "$sign${String.format("%.2f", item.changePercent24h)}%",
-                            color = badgeColor,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.labelMedium
+                        ShowcaseSparkline(
+                            points = item.sparkline,
+                            isPositive = isUp,
+                            modifier = Modifier
+                                .width(72.dp)
+                                .height(28.dp)
                         )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (isUp) IndicatorBuyBackground else IndicatorSellBackground)
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "$sign${String.format(Locale.US, "%.2f", changePct)}%",
+                                color = badgeColor,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                fontFamily = JetBrainsMonoFont
+                            )
+                        }
                     }
                 }
             }
 
-            // Provider Attribution, Quote Timestamp & Status (Strict Rule 7)
             if (item.providerName != null && item.quoteTimestamp != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -187,14 +230,15 @@ fun MarketItemCard(
                         color = TextMuted,
                         fontSize = 10.sp,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(if (item.isStale) Color(0xFF381419) else Color(0xFF093322))
-                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(if (item.isStale) IndicatorSellBackground else IndicatorBuyBackground)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = item.statusText,

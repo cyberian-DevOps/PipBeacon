@@ -1,6 +1,5 @@
 package com.pipbeacon.app.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,16 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pipbeacon.app.core.DataResult
 import com.pipbeacon.app.data.MarketItem
 import com.pipbeacon.app.ui.components.MarketItemCard
+import com.pipbeacon.app.ui.components.ShowcaseBackground
 import com.pipbeacon.app.ui.components.WaitingForProviderCard
-import com.pipbeacon.app.ui.theme.NavyBackground
+import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.NavyBorder
-import com.pipbeacon.app.ui.theme.NavySurface
-import com.pipbeacon.app.ui.theme.TealAccent
+import com.pipbeacon.app.ui.theme.NavyCard
 import com.pipbeacon.app.ui.theme.TextMuted
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
@@ -60,107 +60,99 @@ fun CryptoMarketsScreen(
 ) {
     val categories = listOf("All", "Layer 1", "Payments", "Oracle / DeFi")
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("crypto_screen")
-    ) {
-        // Search & Filter header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = onSearchChange,
-                placeholder = { Text("Search Crypto (e.g. BTC, ETH, SOL)", fontSize = 13.sp) },
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = "Search", tint = TextMuted)
-                },
-                trailingIcon = {
-                    if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { onSearchChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextMuted)
-                        }
-                    }
-                },
-                singleLine = true,
+    ShowcaseBackground(modifier = modifier.testTag("crypto_screen")) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("crypto_search_field"),
-                shape = RoundedCornerShape(10.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TealAccent,
-                    unfocusedBorderColor = NavyBorder,
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedContainerColor = NavySurface,
-                    unfocusedContainerColor = NavySurface
-                )
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Category Chips
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(categories) { cat ->
-                    val isSelected = categoryFilter == cat
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { onCategoryChange(cat) },
-                        label = { Text(cat, fontSize = 12.sp) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = TealAccent,
-                            selectedLabelColor = Color.Black,
-                            containerColor = NavySurface,
-                            labelColor = TextSecondary
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = isSelected,
-                            borderColor = if (isSelected) TealAccent else NavyBorder
-                        )
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchChange,
+                    placeholder = { Text("Search Crypto (e.g. BTC, ETH, SOL)", fontSize = 13.sp, color = TextMuted) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = GoldAccentBright) },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { onSearchChange("") }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextMuted)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("crypto_search_field"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = GoldAccentBright,
+                        unfocusedBorderColor = NavyBorder,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = NavyCard,
+                        unfocusedContainerColor = NavyCard
                     )
-                }
-            }
-        }
+                )
 
-        // List
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (providerStatus !is DataResult.Success) {
-                item {
-                    WaitingForProviderCard(onConfigureClick = onNavigateToSettings)
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-            }
+                Spacer(modifier = Modifier.height(10.dp))
 
-            if (items.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No cryptocurrencies match your search.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(categories) { cat ->
+                        val isSelected = categoryFilter == cat
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onCategoryChange(cat) },
+                            label = { Text(cat, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = GoldAccentBright,
+                                selectedLabelColor = Color(0xFF060D1A),
+                                containerColor = NavyCard,
+                                labelColor = TextSecondary
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) GoldAccentBright else NavyBorder
+                            )
                         )
                     }
                 }
-            } else {
-                items(items) { item ->
-                    MarketItemCard(
-                        item = item,
-                        onClick = { onSelectItem(item) }
-                    )
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (providerStatus !is DataResult.Success) {
+                    item {
+                        WaitingForProviderCard(onConfigureClick = onNavigateToSettings)
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                if (items.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No cryptocurrencies match your search.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextMuted
+                            )
+                        }
+                    }
+                } else {
+                    items(items) { item ->
+                        MarketItemCard(
+                            item = item,
+                            onClick = { onSelectItem(item) }
+                        )
+                    }
                 }
             }
         }

@@ -25,5 +25,6 @@ data class ProviderConfig(
     val accountBalance: Double = 10000.0,
     val themeMode: String = "SYSTEM", // "SYSTEM", "DARK", "LIGHT"
     val notificationsEnabled: Boolean = true,
-    val backgroundRefreshIntervalMinutes: Int = 15 // 15, 30, 60, 0 = manual
+    val backgroundRefreshIntervalMinutes: Int = 15, // 15, 30, 60, 0 = manual
+    val hasCompletedOnboarding: Boolean = false
 )

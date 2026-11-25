@@ -26,11 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pipbeacon.app.core.SignalType
+import com.pipbeacon.app.ui.theme.CyanAccent
 import com.pipbeacon.app.ui.theme.IndicatorBuy
 import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.IndicatorSell
 import com.pipbeacon.app.ui.theme.IndicatorStrongBuy
 import com.pipbeacon.app.ui.theme.IndicatorStrongSell
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
 import com.pipbeacon.app.ui.theme.TextMuted
@@ -44,25 +46,26 @@ fun TechnicalGauge(
     sellCount: Int,
     modifier: Modifier = Modifier
 ) {
+    val needleTint = TextPrimary
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(NavyCard)
-            .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+            .border(1.dp, NavyBorder, RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "SUMMARY SENTIMENT GAUGE",
+                text = "TECHNICAL SUMMARY GAUGE",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextMuted,
-                letterSpacing = 1.sp
+                color = CyanAccent,
+                letterSpacing = 1.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Arc Gauge Canvas
             val needleFraction = when (overallSignal) {
                 SignalType.STRONG_SELL -> 0.1f
                 SignalType.SELL -> 0.3f
@@ -82,8 +85,6 @@ fun TechnicalGauge(
                 val radius = w * 0.42f
                 val strokeWidth = 14.dp.toPx()
 
-                // Draw background arc segments
-                // Strong Sell
                 drawArc(
                     color = IndicatorStrongSell,
                     startAngle = 180f,
@@ -93,7 +94,6 @@ fun TechnicalGauge(
                     size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                     style = Stroke(width = strokeWidth)
                 )
-                // Sell
                 drawArc(
                     color = IndicatorSell,
                     startAngle = 216f,
@@ -103,7 +103,6 @@ fun TechnicalGauge(
                     size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                     style = Stroke(width = strokeWidth)
                 )
-                // Neutral
                 drawArc(
                     color = IndicatorNeutral,
                     startAngle = 252f,
@@ -113,7 +112,6 @@ fun TechnicalGauge(
                     size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                     style = Stroke(width = strokeWidth)
                 )
-                // Buy
                 drawArc(
                     color = IndicatorBuy,
                     startAngle = 288f,
@@ -123,7 +121,6 @@ fun TechnicalGauge(
                     size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
                     style = Stroke(width = strokeWidth)
                 )
-                // Strong Buy
                 drawArc(
                     color = IndicatorStrongBuy,
                     startAngle = 324f,
@@ -134,32 +131,29 @@ fun TechnicalGauge(
                     style = Stroke(width = strokeWidth)
                 )
 
-                // Needle
                 val needleAngleRad = Math.toRadians((180.0 + (needleFraction * 180.0)))
                 val needleLength = radius * 0.85f
                 val needleEnd = Offset(
-                    (center.x + needleLength * Math.cos(needleAngleRad)).toFloat(),
-                    (center.y + needleLength * Math.sin(needleAngleRad)).toFloat()
+                    (center.x + needleLength * kotlin.math.cos(needleAngleRad)).toFloat(),
+                    (center.y + needleLength * kotlin.math.sin(needleAngleRad)).toFloat()
                 )
 
                 drawLine(
-                    color = Color.White,
+                    color = needleTint,
                     start = center,
                     end = needleEnd,
                     strokeWidth = 3.dp.toPx(),
                     cap = StrokeCap.Round
                 )
-                drawCircle(color = Color.White, radius = 6.dp.toPx(), center = center)
+                drawCircle(color = needleTint, radius = 6.dp.toPx(), center = center)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Overall signal text
             SignalBadge(signal = overallSignal)
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Breakdown counters: Sell | Neutral | Buy
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -185,7 +179,7 @@ private fun BreakdownPill(
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = color,
-            style = MaterialTheme.typography.labelMedium
+            fontFamily = JetBrainsMonoFont
         )
     }
 }

@@ -75,6 +75,14 @@ class SettingsViewModel(
         settingsRepository.updateBackgroundRefreshInterval(minutes)
     }
 
+    fun completeOnboarding() {
+        settingsRepository.updateOnboardingCompleted(true)
+    }
+
+    fun resetOnboarding() {
+        settingsRepository.updateOnboardingCompleted(false)
+    }
+
     fun toggleCandidateProvider(providerId: String, enable: Boolean) {
         marketRepository.marketDataRepository.toggleProvider(providerId, enable)
         viewModelScope.launch {

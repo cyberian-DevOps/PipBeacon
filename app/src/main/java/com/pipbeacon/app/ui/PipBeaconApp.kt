@@ -48,11 +48,13 @@ import com.pipbeacon.app.ui.screens.ForexSignalEngineScreen
 import com.pipbeacon.app.ui.screens.HomeScreen
 import com.pipbeacon.app.ui.screens.LiveRatesScreen
 import com.pipbeacon.app.ui.screens.MarketNewsScreen
+import com.pipbeacon.app.ui.screens.OnboardingScreen
 import com.pipbeacon.app.ui.screens.ProfileScreen
 import com.pipbeacon.app.ui.screens.SettingsScreen
 import com.pipbeacon.app.ui.screens.SplashScreen
 import com.pipbeacon.app.ui.screens.TechnicalAnalysisScreen
 import com.pipbeacon.app.ui.screens.TradingCalculatorsScreen
+import com.pipbeacon.app.ui.screens.TradingJournalScreen
 import com.pipbeacon.app.ui.screens.TradingLessonsScreen
 import com.pipbeacon.app.ui.screens.TradingSignalsScreen
 import com.pipbeacon.app.ui.theme.NavyBackground
@@ -137,15 +139,6 @@ fun PipBeaconApp(
     var showSplash by remember { mutableStateOf(true) }
     var currentRoute by remember { mutableStateOf(NavigationDestination.HOME.route) }
 
-    // Intercept system back button to return cleanly to previous hub or Home screen
-    BackHandler(enabled = !showSplash && currentRoute != NavigationDestination.HOME.route) {
-        currentRoute = if (currentRoute == NavigationDestination.SETTINGS.route) {
-            NavigationDestination.PROFILE.route
-        } else {
-            NavigationDestination.HOME.route
-        }
-    }
-
     val marketUiState by marketViewModel.uiState.collectAsStateWithLifecycle()
     val forexList by marketViewModel.forexList.collectAsStateWithLifecycle()
     val cryptoList by marketViewModel.cryptoList.collectAsStateWithLifecycle()
@@ -165,6 +158,15 @@ fun PipBeaconApp(
     val candidateConfigs by settingsViewModel.candidateConfigs.collectAsStateWithLifecycle()
     val providerStatuses by settingsViewModel.providerStatuses.collectAsStateWithLifecycle()
     val academyUiState by academyViewModel.uiState.collectAsStateWithLifecycle()
+
+    // Intercept system back button to return cleanly to previous hub or Home screen
+    BackHandler(enabled = !showSplash && settingsConfig.hasCompletedOnboarding && currentRoute != NavigationDestination.HOME.route) {
+        currentRoute = when (currentRoute) {
+            NavigationDestination.SETTINGS.route,
+            NavigationDestination.JOURNAL.route -> NavigationDestination.PROFILE.route
+            else -> NavigationDestination.HOME.route
+        }
+    }
 
     val systemIsDark = isSystemInDarkTheme()
     val isDarkTheme = when (settingsConfig.themeMode) {
@@ -194,45 +196,72 @@ fun PipBeaconApp(
         NavigationDestination.ANALYSIS.route -> "Technical Analysis"
         NavigationDestination.SIGNAL_ENGINE.route -> "Forex Signal Engine"
         NavigationDestination.SETTINGS.route -> "Settings & Data"
+        NavigationDestination.JOURNAL.route -> "Trading Journal"
+        NavigationDestination.CALENDAR.route -> "Economic Calendar"
         else -> "PipBeacon"
     }
 
+    val selfHeaderRoutes = setOf(
+        NavigationDestination.HOME.route,
+        NavigationDestination.JOURNAL.route,
+        NavigationDestination.FOREX_ACADEMY.route,
+        NavigationDestination.CRYPTO_ACADEMY.route,
+        NavigationDestination.CALCULATORS.route,
+        NavigationDestination.LESSONS.route,
+        NavigationDestination.SIGNAL_ENGINE.route
+    )
+
     PipBeaconTheme(darkTheme = isDarkTheme) {
         Crossfade(
-            targetState = showSplash,
-            animationSpec = tween(durationMillis = 420),
-            label = "splash_crossfade"
-        ) { showingSplash ->
-            if (showingSplash) {
-                SplashScreen(
-                    onSplashComplete = { showSplash = false }
-                )
-            } else {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(if (isDarkTheme) NavyBackground else Color(0xFFF1F5F9)),
-            topBar = {
-                if (currentRoute != NavigationDestination.HOME.route) {
-                    PipBeaconTopBar(
-                        title = screenTitle,
-                        providerStatus = providerStatus,
-                        onRefreshClick = { marketViewModel.refresh() },
-                        onCalculatorClick = { currentRoute = NavigationDestination.CALCULATORS.route },
-                        isDarkTheme = isDarkTheme,
-                        onToggleTheme = onToggleTheme
-                    )
-                }
+            targetState = when {
+                showSplash -> "SPLASH"
+                !settingsConfig.hasCompletedOnboarding -> "ONBOARDING"
+                else -> "MAIN"
             },
-            bottomBar = {
-                if (currentRoute != NavigationDestination.HOME.route) {
-                    PipBeaconBottomNav(
-                        currentRoute = currentRoute,
-                        onNavigate = { route -> currentRoute = route }
+            animationSpec = tween(durationMillis = 420),
+            label = "app_entry_crossfade"
+        ) { entryStage ->
+            when (entryStage) {
+                "SPLASH" -> {
+                    SplashScreen(
+                        onSplashComplete = { showSplash = false }
                     )
                 }
-            }
-        ) { innerPadding ->
+                "ONBOARDING" -> {
+                    OnboardingScreen(
+                        onFinishOnboarding = { settingsViewModel.completeOnboarding() }
+                    )
+                }
+                else -> {
+                    Scaffold(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(if (isDarkTheme) NavyBackground else Color(0xFFF1F5F9)),
+                        topBar = {
+                            if (currentRoute !in selfHeaderRoutes) {
+                                PipBeaconTopBar(
+                                    title = screenTitle,
+                                    providerStatus = providerStatus,
+                                    onRefreshClick = { marketViewModel.refresh() },
+                                    onCalculatorClick = { currentRoute = NavigationDestination.CALCULATORS.route },
+                                    isDarkTheme = isDarkTheme,
+                                    onToggleTheme = onToggleTheme
+                                )
+                            }
+                        },
+                        bottomBar = {
+                            if (currentRoute != NavigationDestination.HOME.route) {
+                                PipBeaconBottomNav(
+                                    currentRoute = if (currentRoute == NavigationDestination.CALENDAR.route) {
+                                        NavigationDestination.NEWS.route
+                                    } else {
+                                        currentRoute
+                                    },
+                                    onNavigate = { route -> currentRoute = route }
+                                )
+                            }
+                        }
+                    ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -280,6 +309,12 @@ fun PipBeaconApp(
                             },
                             onNavigateToCryptoAcademy = {
                                 currentRoute = NavigationDestination.CRYPTO_ACADEMY.route
+                            },
+                            onNavigateToJournal = {
+                                currentRoute = NavigationDestination.JOURNAL.route
+                            },
+                            onNavigateToCalendar = {
+                                currentRoute = NavigationDestination.CALENDAR.route
                             }
                         )
                     }
@@ -422,7 +457,18 @@ fun PipBeaconApp(
                         onNavigateToAnalysis = { symbol ->
                             technicalAnalysisViewModel.selectSymbol(symbol)
                             currentRoute = NavigationDestination.ANALYSIS.route
-                        }
+                        },
+                        initialTab = "NEWS"
+                    )
+                }
+                NavigationDestination.CALENDAR.route -> {
+                    MarketNewsScreen(
+                        viewModel = newsViewModel,
+                        onNavigateToAnalysis = { symbol ->
+                            technicalAnalysisViewModel.selectSymbol(symbol)
+                            currentRoute = NavigationDestination.ANALYSIS.route
+                        },
+                        initialTab = "CALENDAR"
                     )
                 }
                 NavigationDestination.AI_TOOLS.route -> {
@@ -462,6 +508,11 @@ fun PipBeaconApp(
                         onBack = { currentRoute = NavigationDestination.HOME.route }
                     )
                 }
+                NavigationDestination.JOURNAL.route -> {
+                    TradingJournalScreen(
+                        onBack = { currentRoute = NavigationDestination.PROFILE.route }
+                    )
+                }
                 NavigationDestination.PROFILE.route -> {
                     ProfileScreen(
                         academyUiState = academyUiState,
@@ -476,13 +527,16 @@ fun PipBeaconApp(
                         },
                         onOpenForexAcademy = { currentRoute = NavigationDestination.FOREX_ACADEMY.route },
                         onOpenCryptoAcademy = { currentRoute = NavigationDestination.CRYPTO_ACADEMY.route },
-                        onOpenSettings = { currentRoute = NavigationDestination.SETTINGS.route }
+                        onOpenSettings = { currentRoute = NavigationDestination.SETTINGS.route },
+                        onOpenJournal = { currentRoute = NavigationDestination.JOURNAL.route },
+                        onReplayOnboarding = { settingsViewModel.resetOnboarding() }
                     )
                 }
             }
         }
+                    }
+                }
             }
-        }
         }
     }
 }

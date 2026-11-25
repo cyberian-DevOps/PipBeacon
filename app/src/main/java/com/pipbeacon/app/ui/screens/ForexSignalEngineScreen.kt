@@ -101,116 +101,115 @@ fun ForexSignalEngineScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("forex_signal_engine_screen")
+    com.pipbeacon.app.ui.components.ShowcaseBackground(
+        modifier = Modifier.testTag("forex_signal_engine_screen")
     ) {
-        // 1. Top Navigation Bar
-        ForexSignalEngineHeader(
-            isLoading = uiState.isLoading,
-            onBack = onBack,
-            onRefresh = { viewModel.computeSignals() }
-        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 1. Top Navigation Bar
+            ForexSignalEngineHeader(
+                isLoading = uiState.isLoading,
+                onBack = onBack,
+                onRefresh = { viewModel.computeSignals() }
+            )
 
-        // 2. Pair Quick Selector Strip
-        PairSelectorScrollRow(
-            signals = uiState.allSignals,
-            selectedSymbol = uiState.selectedSymbol,
-            onSelect = { viewModel.selectSymbol(it) }
-        )
+            // 2. Pair Quick Selector Strip
+            PairSelectorScrollRow(
+                signals = uiState.allSignals,
+                selectedSymbol = uiState.selectedSymbol,
+                onSelect = { viewModel.selectSymbol(it) }
+            )
 
-        // 3. Main Content
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 14.dp),
-            contentPadding = PaddingValues(top = 10.dp, bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            val signal = uiState.activeSignal
+            // 3. Main Content
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 14.dp),
+                contentPadding = PaddingValues(top = 10.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                val signal = uiState.activeSignal
 
-            if (signal != null) {
-                // Hero Signal & Confluence Card
-                item {
-                    HeroSignalCard(
-                        signal = signal,
-                        selectedTimeframe = uiState.selectedTimeframe,
-                        onTimeframeSelect = { viewModel.setTimeframe(it) },
-                        onOpenChart = { onOpenChart(signal.symbol) }
-                    )
-                }
+                if (signal != null) {
+                    // Hero Signal & Confluence Card
+                    item {
+                        HeroSignalCard(
+                            signal = signal,
+                            selectedTimeframe = uiState.selectedTimeframe,
+                            onTimeframeSelect = { viewModel.setTimeframe(it) },
+                            onOpenChart = { onOpenChart(signal.symbol) }
+                        )
+                    }
 
-                // Multi-Tier Targets Section (TP1, TP2, TP3 and Stop-Loss)
-                item {
-                    MultiTierTargetsSection(
-                        signal = signal,
-                        riskMultiplier = uiState.riskMultiplier,
-                        onRiskMultiplierChange = { viewModel.setRiskMultiplier(it) }
-                    )
-                }
+                    // Multi-Tier Targets Section (TP1, TP2, TP3 and Stop-Loss)
+                    item {
+                        MultiTierTargetsSection(
+                            signal = signal,
+                            riskMultiplier = uiState.riskMultiplier,
+                            onRiskMultiplierChange = { viewModel.setRiskMultiplier(it) }
+                        )
+                    }
 
-                // Technical Indicators Telemetry Grid (RSI, EMA 20/50, MACD, ATR 14)
-                item {
-                    IndicatorsTelemetrySection(signal = signal)
-                }
+                    // Technical Indicators Telemetry Grid (RSI, EMA 20/50, MACD, ATR 14)
+                    item {
+                        IndicatorsTelemetrySection(signal = signal)
+                    }
 
-                // Volatility-Adjusted Risk Management & Lot Size Calculator
-                item {
-                    VolatilityRiskManagementCard(
-                        signal = signal,
-                        accountBalance = uiState.accountBalance,
-                        riskPercent = uiState.riskPercentage,
-                        recommendedLots = uiState.recommendedLotSize,
-                        onBalanceChange = { viewModel.setAccountBalance(it) },
-                        onRiskChange = { viewModel.setRiskPercentage(it) }
-                    )
-                }
+                    // Volatility-Adjusted Risk Management & Lot Size Calculator
+                    item {
+                        VolatilityRiskManagementCard(
+                            signal = signal,
+                            accountBalance = uiState.accountBalance,
+                            riskPercent = uiState.riskPercentage,
+                            recommendedLots = uiState.recommendedLotSize,
+                            onBalanceChange = { viewModel.setAccountBalance(it) },
+                            onRiskChange = { viewModel.setRiskPercentage(it) }
+                        )
+                    }
 
-                // Strategy Notes & Confluence Summary
-                item {
-                    StrategyConfluenceCard(signal = signal)
-                }
-            } else if (uiState.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(260.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(color = GoldAccentBright, strokeWidth = 3.dp)
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Text(
-                                text = "Computing technical indicators across Forex pairs...",
-                                color = TextSecondary,
-                                fontSize = 12.sp
-                            )
+                    // Strategy Notes & Confluence Summary
+                    item {
+                        StrategyConfluenceCard(signal = signal)
+                    }
+                } else if (uiState.isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(260.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator(color = GoldAccentBright, strokeWidth = 3.dp)
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Text(
+                                    text = "Computing technical indicators across Forex pairs...",
+                                    color = TextSecondary,
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            // Quick Overview of other Forex Pairs
-            item {
-                Text(
-                    text = "ALL COMPUTED FOREX SIGNALS",
-                    color = TextMuted,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+                // Quick Overview of other Forex Pairs
+                item {
+                    Text(
+                        text = "ALL COMPUTED FOREX SIGNALS",
+                        color = TextMuted,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
 
-            items(uiState.allSignals) { otherSignal ->
-                ForexSignalRowItem(
-                    signal = otherSignal,
-                    isSelected = otherSignal.symbol == uiState.selectedSymbol,
-                    onClick = { viewModel.selectSymbol(otherSignal.symbol) }
-                )
+                items(uiState.allSignals) { otherSignal ->
+                    ForexSignalRowItem(
+                        signal = otherSignal,
+                        isSelected = otherSignal.symbol == uiState.selectedSymbol,
+                        onClick = { viewModel.selectSymbol(otherSignal.symbol) }
+                    )
+                }
             }
         }
     }

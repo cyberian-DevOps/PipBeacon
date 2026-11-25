@@ -14,25 +14,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCardElevated
-import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
 
@@ -44,9 +43,9 @@ fun WaitingForProviderCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(NavyCardElevated)
-            .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+            .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
             .padding(16.dp)
     ) {
         Column {
@@ -59,14 +58,15 @@ fun WaitingForProviderCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Waiting for permitted data provider",
+                    text = "Offline Demonstration & Public Feed Options",
                     style = MaterialTheme.typography.titleMedium,
-                    color = TextPrimary
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "PipBeacon operates with zero proprietary cloud charges. No simulated prices are displayed. Configure a free public rates provider or custom endpoint in Settings to stream live market data.",
+                text = "PipBeacon runs completely offline using bundled demonstration data, or you can enable a permitted public data source in Settings.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary,
                 lineHeight = 18.sp
@@ -75,8 +75,11 @@ fun WaitingForProviderCard(
             Row {
                 Button(
                     onClick = onConfigureClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent, contentColor = Color.Black),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldAccentBright,
+                        contentColor = Color(0xFF060D1A)
+                    ),
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
@@ -84,7 +87,7 @@ fun WaitingForProviderCard(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Configure Data Source", style = MaterialTheme.typography.labelMedium)
+                    Text("Configure Data Source", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }

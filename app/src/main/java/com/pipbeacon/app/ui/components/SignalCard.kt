@@ -157,7 +157,7 @@ fun SignalCard(
                             color = TextPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = com.pipbeacon.app.ui.theme.JetBrainsMonoFont
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -181,7 +181,7 @@ fun SignalCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFF0F261E))
+                        .background(IndicatorBuyBackground)
                         .border(1.dp, TealAccent.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
@@ -204,7 +204,7 @@ fun SignalCard(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(6.dp))
-                                .background(Color(0xFF0C2B22))
+                                .background(IndicatorBuyBackground)
                                 .border(1.dp, IndicatorBuy.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
@@ -219,7 +219,7 @@ fun SignalCard(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(6.dp))
-                                .background(if (isClosed) Color(0xFF222838) else Color(0xFF0E2219))
+                                .background(if (isClosed) NavySurfaceVariant else IndicatorBuyBackground)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(

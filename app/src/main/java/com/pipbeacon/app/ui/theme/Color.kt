@@ -3,81 +3,94 @@ package com.pipbeacon.app.ui.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Obsidian Deep Navy backgrounds & cards in Dark mode, Crisp clean slate surfaces in Light mode
+// Showcase Midnight Navy backgrounds & elevated cards in Dark mode, Crisp Daylight Slate in Light mode
 val NavyBackground: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF0B0F17) else Color(0xFFF1F5F9)
+    get() = if (LocalThemeIsDark.current) Color(0xFF060D1A) else Color(0xFFF4F7FB)
+
+val NavyBackgroundBottom: Color
+    @Composable
+    get() = if (LocalThemeIsDark.current) Color(0xFF0B1528) else Color(0xFFEAF0F8)
 
 val NavySurface: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF1E293B) else Color(0xFFFFFFFF)
+    get() = if (LocalThemeIsDark.current) Color(0xFF0A1426) else Color(0xFFFFFFFF)
 
 val NavySurfaceVariant: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF141D2C) else Color(0xFFF8FAFC)
+    get() = if (LocalThemeIsDark.current) Color(0xFF091324) else Color(0xFFF1F5F9)
 
 val NavyCard: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF1E293B) else Color(0xFFFFFFFF)
+    get() = if (LocalThemeIsDark.current) Color(0xFF0F1C33) else Color(0xFFFFFFFF)
 
 val NavyCardElevated: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF242C3D) else Color(0xFFF1F5F9)
+    get() = if (LocalThemeIsDark.current) Color(0xFF13223B) else Color(0xFFF8FAFC)
 
 val NavyBorder: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF334155) else Color(0xFFCBD5E1)
+    get() = if (LocalThemeIsDark.current) Color(0xFF1E3454) else Color(0xFFD6E0EC)
 
 val NavyBorderSubtle: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF1E2433) else Color(0xFFE2E8F0)
+    get() = if (LocalThemeIsDark.current) Color(0xFF152540) else Color(0xFFE2E8F0)
 
-// Luxury Golden Amber Accents (from reference images: buttons, badges, tutor icon)
-val GoldAccent = Color(0xFFF59E0B)
-val GoldAccentBright = Color(0xFFFBBF24)
+// Metallic Gold Accents (Pill CTAs, Lighthouse Beacon, Active Tabs, Badges)
+val GoldAccent = Color(0xFFF5B731)
+val GoldAccentBright = Color(0xFFFACC15)
 val GoldAccentDark = Color(0xFFD97706)
-val GoldAccentBackground = Color(0xFF332205)
+val GoldAccentBackground: Color
+    @Composable
+    get() = if (LocalThemeIsDark.current) Color(0xFF2B210B) else Color(0xFFFEF3C7)
 
-// Cyan / Teal Accents
-val TealAccent = Color(0xFF00D09C)
-val TealAccentSecondary = Color(0xFF00B4D8)
-val TealDark = Color(0xFF006B7D)
+// Electric Cyan / Sky Accents (Quick Access Rings, Chart Indicators, Play Badges)
+val CyanAccent: Color
+    @Composable
+    get() = if (LocalThemeIsDark.current) Color(0xFF38BDF8) else Color(0xFF0284C7)
 
-// Neon Emerald & Forest Green Indicators (BUY, TP hit, Win Rate, Positive Pips)
-val IndicatorBuy = Color(0xFF00D09C)
+val TealAccent: Color
+    @Composable
+    get() = if (LocalThemeIsDark.current) Color(0xFF38BDF8) else Color(0xFF0284C7)
+
+val TealAccentSecondary = Color(0xFF0EA5E9)
+val TealDark = Color(0xFF075985)
+
+// Emerald Profit / BUY Indicators
+val IndicatorBuy = Color(0xFF10B981)
 val IndicatorStrongBuy = Color(0xFF059669)
 val IndicatorBuyBackground: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF062B1F) else Color(0xFFDCFCE7)
-val IndicatorBuyBorder = Color(0xFF00D09C).copy(alpha = 0.35f)
+    get() = if (LocalThemeIsDark.current) Color(0xFF072A22) else Color(0xFFDCFCE7)
+val IndicatorBuyBorder = Color(0xFF10B981).copy(alpha = 0.4f)
 
-// Ruby Coral Indicators (SELL, Stop Loss)
-val IndicatorSell = Color(0xFFFF4B4B)
+// Ruby Loss / SELL / High Impact Indicators
+val IndicatorSell = Color(0xFFEF4444)
 val IndicatorStrongSell = Color(0xFFDC2626)
 val IndicatorSellBackground: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF321216) else Color(0xFFFEE2E2)
-val IndicatorSellBorder = Color(0xFFFF4B4B).copy(alpha = 0.35f)
+    get() = if (LocalThemeIsDark.current) Color(0xFF33141A) else Color(0xFFFEE2E2)
+val IndicatorSellBorder = Color(0xFFEF4444).copy(alpha = 0.4f)
 
-// Neutral Indicators
-val IndicatorNeutral = Color(0xFFFBBF24)
+// Neutral / Medium Impact Indicators
+val IndicatorNeutral = Color(0xFFF5B731)
 val IndicatorNeutralBackground: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF332A0F) else Color(0xFFFEF3C7)
+    get() = if (LocalThemeIsDark.current) Color(0xFF2A210B) else Color(0xFFFEF3C7)
 
 // Text Colors
 val TextPrimary: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFFFFFFFF) else Color(0xFF0F172A)
+    get() = if (LocalThemeIsDark.current) Color(0xFFF8FAFC) else Color(0xFF0F172A)
 
 val TextSecondary: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF94A3B8) else Color(0xFF475569)
+    get() = if (LocalThemeIsDark.current) Color(0xFF9FB0C7) else Color(0xFF475569)
 
 val TextMuted: Color
     @Composable
-    get() = if (LocalThemeIsDark.current) Color(0xFF64748B) else Color(0xFF64748B)
+    get() = if (LocalThemeIsDark.current) Color(0xFF6B7F9E) else Color(0xFF64748B)
 
 // Candlestick Colors
-val CandleBullish = Color(0xFF00D09C)
-val CandleBearish = Color(0xFFFF4B4B)
+val CandleBullish = Color(0xFF10B981)
+val CandleBearish = Color(0xFFEF4444)

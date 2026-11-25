@@ -49,4 +49,8 @@ class SettingsRepository {
     fun updateBackgroundRefreshInterval(minutes: Int) {
         _config.value = _config.value.copy(backgroundRefreshIntervalMinutes = minutes)
     }
+
+    fun updateOnboardingCompleted(completed: Boolean) {
+        _config.value = _config.value.copy(hasCompletedOnboarding = completed)
+    }
 }

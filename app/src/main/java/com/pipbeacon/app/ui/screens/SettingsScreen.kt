@@ -95,14 +95,14 @@ fun SettingsScreen(
     onBackgroundRefreshIntervalChange: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("settings_screen"),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    com.pipbeacon.app.ui.components.ShowcaseBackground(
+        modifier = modifier.testTag("settings_screen")
     ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
         // Section: Permitted Data Provider Governance
         item {
             Box(
@@ -644,8 +644,8 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF1E1710))
-                    .border(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                    .background(com.pipbeacon.app.ui.theme.IndicatorNeutralBackground)
+                    .border(1.dp, com.pipbeacon.app.ui.theme.GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
                     .padding(16.dp)
                     .testTag("risk_disclaimer_card")
             ) {
@@ -654,7 +654,7 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.Default.Warning,
                             contentDescription = "Warning",
-                            tint = Color(0xFFF59E0B),
+                            tint = IndicatorNeutral,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -662,7 +662,7 @@ fun SettingsScreen(
                             text = "MANDATORY FINANCIAL RISK DISCLAIMER",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFF59E0B)
+                            color = IndicatorNeutral
                         )
                     }
 
@@ -673,7 +673,7 @@ fun SettingsScreen(
                                 "All signals, indicators, and analytics presented in PipBeacon are strictly educational, informational, and experimental rule-based mathematical outputs. " +
                                 "PipBeacon never provides personalized financial advice, guarantees no profits or win rates, does not execute trades, and never connects to brokerage accounts.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFFFCD34D),
+                        color = TextPrimary,
                         fontSize = 11.sp,
                         lineHeight = 16.sp
                     )
@@ -747,6 +747,7 @@ fun SettingsScreen(
                 Text("Reset All Configurations to Factory Defaults")
             }
         }
+    }
     }
 }
 

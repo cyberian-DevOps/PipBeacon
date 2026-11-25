@@ -11,47 +11,53 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CandlestickChart
 import androidx.compose.material.icons.filled.CrisisAlert
 import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -80,45 +86,66 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pipbeacon.app.core.DataResult
+import com.pipbeacon.app.core.MarketType
 import com.pipbeacon.app.data.MarketItem
 import com.pipbeacon.app.data.MarketSession
 import com.pipbeacon.app.data.SignalItem
+import com.pipbeacon.app.ui.components.PipBeaconLighthouseArt
+import com.pipbeacon.app.ui.components.ShowcaseGoldButton
+import com.pipbeacon.app.ui.components.ShowcaseSparkline
+import com.pipbeacon.app.ui.theme.CyanAccent
+import com.pipbeacon.app.ui.theme.GoldAccent
+import com.pipbeacon.app.ui.theme.GoldAccentBright
+import com.pipbeacon.app.ui.theme.IndicatorBuy
+import com.pipbeacon.app.ui.theme.IndicatorBuyBackground
+import com.pipbeacon.app.ui.theme.IndicatorNeutralBackground
+import com.pipbeacon.app.ui.theme.IndicatorSell
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
+import com.pipbeacon.app.ui.theme.LocalThemeIsDark
+import com.pipbeacon.app.ui.theme.NavyBackground
+import com.pipbeacon.app.ui.theme.NavyBackgroundBottom
+import com.pipbeacon.app.ui.theme.NavyBorder
+import com.pipbeacon.app.ui.theme.NavyCard
+import com.pipbeacon.app.ui.theme.NavySurface
+import com.pipbeacon.app.ui.theme.NavySurfaceVariant
+import com.pipbeacon.app.ui.theme.PlusJakartaSansFont
+import com.pipbeacon.app.ui.theme.TextMuted
+import com.pipbeacon.app.ui.theme.TextPrimary
+import com.pipbeacon.app.ui.theme.TextSecondary
 import java.util.Locale
 
 // =============================================================================
-// 1. EXACT COLOR PALETTE (PipBeacon Dark & Light Mode Specifications)
+// 1. SHOWCASE COLOR PALETTE TOKENS (Dark & Light Mode)
 // =============================================================================
 val ColorScreenBackground: Color
     @Composable
-    get() = if (com.pipbeacon.app.ui.theme.LocalThemeIsDark.current) Color(0xFF0B0F17) else Color(0xFFF1F5F9)
+    get() = NavyBackground
 
 val ColorSurfaceCard: Color
     @Composable
-    get() = if (com.pipbeacon.app.ui.theme.LocalThemeIsDark.current) Color(0xFF1E293B) else Color(0xFFFFFFFF)
+    get() = NavyCard
 
 val ColorBorderDivider: Color
     @Composable
-    get() = if (com.pipbeacon.app.ui.theme.LocalThemeIsDark.current) Color(0xFF334155) else Color(0xFFCBD5E1)
+    get() = NavyBorder
 
-val ColorGoldAccent       = Color(0xFFEAB308) // PipBeacon Gold Accent (VIP, Highlights)
-val ColorProfitGreen      = Color(0xFF10B981) // Profit / BUY Green
-val ColorLossRed          = Color(0xFFEF4444) // Loss / SELL Red
-val ColorAccentCyan       = Color(0xFF38BDF8) // Accent Blue / Cyan
+val ColorGoldAccent = Color(0xFFF5B731)
+val ColorProfitGreen = Color(0xFF10B981)
+val ColorLossRed = Color(0xFFEF4444)
+val ColorAccentCyan = Color(0xFF38BDF8)
 
 val ColorMutedSlate: Color
     @Composable
-    get() = if (com.pipbeacon.app.ui.theme.LocalThemeIsDark.current) Color(0xFF94A3B8) else Color(0xFF64748B)
+    get() = TextSecondary
 
 val ColorTextWhite: Color
     @Composable
-    get() = if (com.pipbeacon.app.ui.theme.LocalThemeIsDark.current) Color(0xFFFFFFFF) else Color(0xFF0F172A)
+    get() = TextPrimary
 
 data class DashboardThemeColors(
     val background: Color,
@@ -127,7 +154,7 @@ data class DashboardThemeColors(
     val textPrimary: Color,
     val textMuted: Color,
     val subSurface: Color,
-    val gold: Color = Color(0xFFEAB308),
+    val gold: Color = Color(0xFFF5B731),
     val green: Color = Color(0xFF10B981),
     val red: Color = Color(0xFFEF4444),
     val cyan: Color = Color(0xFF38BDF8),
@@ -138,23 +165,23 @@ data class DashboardThemeColors(
 fun getDashboardColors(isDark: Boolean): DashboardThemeColors {
     return if (isDark) {
         DashboardThemeColors(
-            background = Color(0xFF0B0F17),
-            surface = Color(0xFF1E293B),
-            border = Color(0xFF334155),
-            textPrimary = Color(0xFFFFFFFF),
-            textMuted = Color(0xFF94A3B8),
-            subSurface = Color(0xFF0F172A),
-            greenSurface = Color(0xFF092E20),
+            background = Color(0xFF060D1A),
+            surface = Color(0xFF0F1C33),
+            border = Color(0xFF1E3454),
+            textPrimary = Color(0xFFF8FAFC),
+            textMuted = Color(0xFF9FB0C7),
+            subSurface = Color(0xFF091324),
+            greenSurface = Color(0xFF072A22),
             isDark = true
         )
     } else {
         DashboardThemeColors(
-            background = Color(0xFFF1F5F9),
+            background = Color(0xFFF4F7FB),
             surface = Color(0xFFFFFFFF),
-            border = Color(0xFFCBD5E1),
+            border = Color(0xFFD6E0EC),
             textPrimary = Color(0xFF0F172A),
-            textMuted = Color(0xFF64748B),
-            subSurface = Color(0xFFF8FAFC),
+            textMuted = Color(0xFF475569),
+            subSurface = Color(0xFFF1F5F9),
             greenSurface = Color(0xFFDCFCE7),
             isDark = false
         )
@@ -167,7 +194,7 @@ fun getDashboardColors(isDark: Boolean): DashboardThemeColors {
 data class TechnicalSignal(
     val id: String,
     val symbol: String,
-    val action: String, // "BUY" or "SELL"
+    val action: String,
     val status: String = "ACTIVE",
     val entryPrice: Double,
     val stopLoss: Double,
@@ -188,29 +215,25 @@ data class MarketTickerItem(
 )
 
 // =============================================================================
-// 2. MODULAR COMPOSABLES ARCHITECTURE
+// 2. MODULAR COMPOSABLES ARCHITECTURE (SHOWCASE REDESIGN)
 // =============================================================================
 
-/**
- * 2.1 Top App Bar:
- * - App title "PipBeacon: Market Pulse" with a green "Live Data Active" status dot.
- * - Actions: Theme Switcher (☀️/🌙), Calculator icon, and Refresh icon.
- */
 @Composable
 fun PipBeaconHeader(
-    title: String = "PipBeacon: Market Pulse",
-    statusText: String = "Live Data Active",
+    title: String = "PipBeacon",
+    statusText: String = "Offline Ready • Demo Data",
     isRefreshing: Boolean = false,
     isDarkTheme: Boolean = true,
     onToggleTheme: () -> Unit = {},
     onCalculatorClick: () -> Unit = {},
     onRefreshClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     colors: DashboardThemeColors = getDashboardColors(isDarkTheme),
     modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse_dot")
     val dotAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.35f,
+        initialValue = 0.45f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
             animation = tween(900, easing = FastOutSlowInEasing),
@@ -219,68 +242,92 @@ fun PipBeaconHeader(
         label = "dotAlpha"
     )
 
-    Surface(
-        color = colors.surface,
-        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, colors.border),
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(NavySurface)
+            .statusBarsPadding()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = title,
-                    color = colors.textPrimary,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.SansSerif
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = onProfileClick,
+                    modifier = Modifier.testTag("header_profile_action")
+                ) {
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
-                            .background(colors.green.copy(alpha = dotAlpha))
+                            .background(colors.cyan.copy(alpha = 0.12f))
+                            .border(1.dp, colors.cyan.copy(alpha = 0.4f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            tint = colors.cyan,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    PipBeaconLighthouseArt(
+                        modifier = Modifier.size(28.dp),
+                        showCandles = false
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = statusText,
-                        color = colors.green,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = title,
+                            color = colors.textPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontFamily = PlusJakartaSansFont
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(7.dp)
+                                    .clip(CircleShape)
+                                    .background(colors.green.copy(alpha = dotAlpha))
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(
+                                text = statusText,
+                                color = colors.green,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
                 }
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Task 1: Dark / Light Mode Toggle Button
                 IconButton(
                     onClick = onToggleTheme,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .testTag("header_theme_toggle_action")
+                    modifier = Modifier.testTag("header_theme_toggle_action")
                 ) {
                     Icon(
                         imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
                         contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode",
-                        tint = if (isDarkTheme) colors.gold else Color(0xFF6366F1),
+                        tint = if (isDarkTheme) GoldAccentBright else Color(0xFF4F46E5),
                         modifier = Modifier.size(20.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(2.dp))
-
                 IconButton(
                     onClick = onCalculatorClick,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .testTag("header_calculator_action")
+                    modifier = Modifier.testTag("header_calculator_action")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Calculate,
@@ -290,14 +337,10 @@ fun PipBeaconHeader(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(2.dp))
-
                 IconButton(
                     onClick = onRefreshClick,
                     enabled = !isRefreshing,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .testTag("header_refresh_action")
+                    modifier = Modifier.testTag("header_refresh_action")
                 ) {
                     if (isRefreshing) {
                         CircularProgressIndicator(
@@ -316,17 +359,370 @@ fun PipBeaconHeader(
                 }
             }
         }
+        HorizontalDivider(color = colors.border.copy(alpha = 0.7f), thickness = 1.dp)
     }
 }
 
 /**
- * 2.2 Hero Win Rate & Metrics Card:
- * - Left side: Circular progress win rate gauge showing "86%" with badge "5 Active".
- * - Right side: Total pips card showing "+9927 PIPS" in green.
- * - Filter Chips Row: "All", "Active", "Closed", "Stats".
- * - Regulatory Disclaimer Banner: Yellow-bordered notice reading:
- *   "Educational only. Not financial advice. Trading involves risk of loss."
+ * Showcase Hero Card: "Trade Smarter with PipBeacon" + "Learn More ->" pill + Lighthouse art
  */
+@Composable
+fun ShowcaseDashboardHeroCard(
+    onLearnMoreClick: () -> Unit,
+    colors: DashboardThemeColors,
+    modifier: Modifier = Modifier
+) {
+    val cardBrush = if (colors.isDark) {
+        Brush.horizontalGradient(
+            colors = listOf(Color(0xFF0E1D36), Color(0xFF13294B))
+        )
+    } else {
+        Brush.horizontalGradient(
+            colors = listOf(Color(0xFFFFFFFF), Color(0xFFEFF6FF))
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(cardBrush)
+            .border(1.dp, colors.border, RoundedCornerShape(18.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1.2f)) {
+                Text(
+                    text = "Trade Smarter\nwith PipBeacon",
+                    color = colors.textPrimary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 25.sp
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Learn. Analyze. Study setups.",
+                    color = colors.textMuted,
+                    fontSize = 11.5.sp
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                ShowcaseGoldButton(
+                    text = "Learn More",
+                    trailingArrow = true,
+                    height = 40.dp,
+                    onClick = onLearnMoreClick,
+                    modifier = Modifier.testTag("hero_learn_more_button")
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            PipBeaconLighthouseArt(
+                modifier = Modifier
+                    .size(width = 118.dp, height = 110.dp),
+                showCandles = true
+            )
+        }
+    }
+}
+
+/**
+ * Showcase Markets Overview Card: EUR/USD & BTC/USDT rows with smooth Canvas Sparklines
+ */
+@Composable
+fun ShowcaseMarketsOverviewSection(
+    items: List<MarketItem>,
+    onSeeAllClick: () -> Unit,
+    onSelectSymbol: (String) -> Unit,
+    colors: DashboardThemeColors,
+    modifier: Modifier = Modifier
+) {
+    val overviewPairs = remember(items) {
+        val eur = items.firstOrNull { it.symbol == "EUR/USD" }
+        val btc = items.firstOrNull { it.symbol.startsWith("BTC") }
+        val list = listOfNotNull(eur, btc)
+        if (list.size >= 2) {
+            list
+        } else {
+            listOf(
+                MarketItem(
+                    id = "eurusd_demo",
+                    symbol = "EUR/USD",
+                    name = "Euro / US Dollar",
+                    marketType = MarketType.FOREX,
+                    category = "Major",
+                    currentPrice = 1.0825,
+                    change24h = 0.0037,
+                    changePercent24h = 0.34,
+                    high24h = 1.0842,
+                    low24h = 1.0778,
+                    sparkline = listOf(1.078, 1.080, 1.079, 1.081, 1.083, 1.082, 1.0825),
+                    isProviderLive = true
+                ),
+                MarketItem(
+                    id = "btcusdt_demo",
+                    symbol = "BTC/USDT",
+                    name = "Bitcoin",
+                    marketType = MarketType.CRYPTO,
+                    category = "Layer 1",
+                    currentPrice = 67432.0,
+                    change24h = 1238.0,
+                    changePercent24h = 1.87,
+                    high24h = 67890.0,
+                    low24h = 65750.0,
+                    sparkline = listOf(65800.0, 66100.0, 65950.0, 66600.0, 67100.0, 66900.0, 67432.0),
+                    isProviderLive = true
+                )
+            )
+        }
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Markets Overview",
+                color = colors.textPrimary,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onSeeAllClick)
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "See All",
+                    color = colors.cyan,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "See All Markets",
+                    tint = colors.cyan,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Surface(
+            color = colors.surface,
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, colors.border),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                overviewPairs.forEachIndexed { idx, item ->
+                    val isPositive = (item.changePercent24h ?: 0.0) >= 0.0
+                    val changeColor = if (isPositive) colors.green else colors.red
+                    val sign = if (isPositive) "+" else ""
+                    val isCrypto = item.marketType == MarketType.CRYPTO
+                    val priceStr = item.currentPrice?.let {
+                        if (it >= 100.0) String.format(Locale.US, "%,.0f", it) else String.format(Locale.US, "%.4f", it)
+                    } ?: "--"
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onSelectSymbol(item.symbol) }
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1.25f)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isCrypto) colors.gold.copy(alpha = 0.16f) else colors.cyan.copy(alpha = 0.16f)
+                                    )
+                                    .border(
+                                        1.dp,
+                                        if (isCrypto) colors.gold.copy(alpha = 0.45f) else colors.cyan.copy(alpha = 0.45f),
+                                        CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = if (isCrypto) Icons.Default.CurrencyBitcoin else Icons.Default.CurrencyExchange,
+                                    contentDescription = null,
+                                    tint = if (isCrypto) colors.gold else colors.cyan,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = item.symbol,
+                                    color = colors.textPrimary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = priceStr,
+                                    color = colors.textMuted,
+                                    fontSize = 12.sp,
+                                    fontFamily = JetBrainsMonoFont,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
+                        ShowcaseSparkline(
+                            points = item.sparkline,
+                            isPositive = isPositive,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(30.dp)
+                                .padding(horizontal = 8.dp)
+                        )
+
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.weight(0.75f)
+                        ) {
+                            Text(
+                                text = "$sign${String.format(Locale.US, "%.2f", item.changePercent24h ?: 0.0)}%",
+                                color = changeColor,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = JetBrainsMonoFont
+                            )
+                            Text(
+                                text = if (isCrypto) "24H Demo" else "FX Spot",
+                                color = colors.textMuted,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    if (idx < overviewPairs.lastIndex) {
+                        HorizontalDivider(color = colors.border.copy(alpha = 0.5f), thickness = 1.dp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Showcase Quick Access: 4 glowing circular rings ("Learn", "Analysis", "Signals", "News")
+ */
+@Composable
+fun ShowcaseQuickAccessRings(
+    onLearnClick: () -> Unit,
+    onAnalysisClick: () -> Unit,
+    onSignalsClick: () -> Unit,
+    onNewsClick: () -> Unit,
+    colors: DashboardThemeColors,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = "Quick Access",
+            color = colors.textPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            QuickRingItem(
+                label = "Learn",
+                icon = Icons.Default.School,
+                ringColor = colors.gold,
+                onClick = onLearnClick,
+                colors = colors,
+                modifier = Modifier.weight(1f).testTag("quick_ring_learn")
+            )
+            QuickRingItem(
+                label = "Analysis",
+                icon = Icons.Default.QueryStats,
+                ringColor = colors.cyan,
+                onClick = onAnalysisClick,
+                colors = colors,
+                modifier = Modifier.weight(1f).testTag("quick_ring_analysis")
+            )
+            QuickRingItem(
+                label = "Signals",
+                icon = Icons.Default.CrisisAlert,
+                ringColor = colors.gold,
+                onClick = onSignalsClick,
+                colors = colors,
+                modifier = Modifier.weight(1f).testTag("quick_ring_signals")
+            )
+            QuickRingItem(
+                label = "News",
+                icon = Icons.Default.Newspaper,
+                ringColor = colors.cyan,
+                onClick = onNewsClick,
+                colors = colors,
+                modifier = Modifier.weight(1f).testTag("quick_ring_news")
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickRingItem(
+    label: String,
+    icon: ImageVector,
+    ringColor: Color,
+    onClick: () -> Unit,
+    colors: DashboardThemeColors,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(54.dp)
+                .clip(CircleShape)
+                .background(colors.surface)
+                .border(1.5.dp, ringColor.copy(alpha = 0.7f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = ringColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = label,
+            color = colors.textPrimary,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
+    }
+}
+
 @Composable
 fun WinRateHeroCard(
     winRate: Int = 86,
@@ -341,7 +737,7 @@ fun WinRateHeroCard(
     Surface(
         color = ColorSurfaceCard,
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
+        border = BorderStroke(1.dp, ColorBorderDivider),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
@@ -349,41 +745,39 @@ fun WinRateHeroCard(
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
-            // Main Metrics Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left: Circular Progress Win Rate Gauge
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1.1f)
                 ) {
                     Box(
-                        modifier = Modifier.size(68.dp),
+                        modifier = Modifier.size(64.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
+                        androidx.compose.material3.CircularProgressIndicator(
                             progress = { 1.0f },
                             modifier = Modifier.fillMaxSize(),
                             color = ColorBorderDivider,
-                            strokeWidth = 7.dp,
+                            strokeWidth = 6.dp,
                             strokeCap = StrokeCap.Round
                         )
-                        CircularProgressIndicator(
+                        androidx.compose.material3.CircularProgressIndicator(
                             progress = { winRate / 100f },
                             modifier = Modifier.fillMaxSize(),
                             color = ColorGoldAccent,
-                            strokeWidth = 7.dp,
+                            strokeWidth = 6.dp,
                             strokeCap = StrokeCap.Round
                         )
                         Text(
                             text = "$winRate%",
                             color = ColorGoldAccent,
-                            fontSize = 17.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                     }
 
@@ -399,17 +793,17 @@ fun WinRateHeroCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "MARKET PULSE",
+                                text = "SAMPLE TRACK RECORD",
                                 color = ColorMutedSlate,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp
+                                letterSpacing = 0.4.sp
                             )
                         }
                         Text(
-                            text = "Win Rate",
+                            text = "Study Win Rate",
                             color = ColorTextWhite,
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(3.dp))
@@ -430,17 +824,16 @@ fun WinRateHeroCard(
                     }
                 }
 
-                // Right: Total Pips Banner
                 Surface(
-                    color = com.pipbeacon.app.ui.theme.IndicatorBuyBackground,
+                    color = IndicatorBuyBackground,
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, ColorProfitGreen.copy(alpha = 0.4f)),
+                    border = BorderStroke(1.dp, ColorProfitGreen.copy(alpha = 0.4f)),
                     modifier = Modifier.weight(0.9f)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 10.dp, horizontal = 12.dp),
+                            .padding(vertical = 10.dp, horizontal = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -448,11 +841,11 @@ fun WinRateHeroCard(
                                 imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                                 contentDescription = null,
                                 tint = ColorProfitGreen,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(15.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "NET GAIN",
+                                text = "SAMPLE PIPS",
                                 color = ColorProfitGreen,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold
@@ -462,12 +855,12 @@ fun WinRateHeroCard(
                         Text(
                             text = totalPips,
                             color = ColorProfitGreen,
-                            fontSize = 17.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                         Text(
-                            text = "$tpHits TP Hits • $totalSignals Total",
+                            text = "$tpHits TP Hits • $totalSignals Setups",
                             color = ColorProfitGreen.copy(alpha = 0.85f),
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Medium
@@ -476,9 +869,8 @@ fun WinRateHeroCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Filter Chips Row: "All", "Active", "Closed", "Stats"
             val filters = listOf("All", "Active", "Closed", "Stats")
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -498,7 +890,7 @@ fun WinRateHeroCard(
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = ColorGoldAccent,
-                            selectedLabelColor = Color.Black,
+                            selectedLabelColor = Color(0xFF060D1A),
                             containerColor = ColorScreenBackground,
                             labelColor = ColorMutedSlate
                         ),
@@ -512,15 +904,14 @@ fun WinRateHeroCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Regulatory Disclaimer Banner (Yellow-bordered notice)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(com.pipbeacon.app.ui.theme.IndicatorNeutralBackground)
-                    .border(1.dp, ColorGoldAccent.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                    .background(IndicatorNeutralBackground)
+                    .border(1.dp, ColorGoldAccent.copy(alpha = 0.65f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 10.dp, vertical = 7.dp)
             ) {
                 Row(
@@ -535,7 +926,7 @@ fun WinRateHeroCard(
                     )
                     Spacer(modifier = Modifier.width(7.dp))
                     Text(
-                        text = "Educational only. Not financial advice. Trading involves risk of loss.",
+                        text = "Educational only. Demonstration data. Not financial advice.",
                         color = ColorGoldAccent,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -547,10 +938,6 @@ fun WinRateHeroCard(
     }
 }
 
-/**
- * 2.3 Quick Action Grid:
- * 4 rounded grid cards side-by-side: "Live Rates", "AI Signals", "Market News", "Calculators"
- */
 @Composable
 fun QuickActionGrid(
     onLiveRatesClick: () -> Unit = {},
@@ -565,23 +952,23 @@ fun QuickActionGrid(
     ) {
         QuickActionItem(
             title = "Live Rates",
-            subtitle = "60+ Pairs",
+            subtitle = "FX & Crypto",
             icon = Icons.AutoMirrored.Filled.TrendingUp,
             accentColor = ColorProfitGreen,
             onClick = onLiveRatesClick,
             modifier = Modifier.weight(1f)
         )
         QuickActionItem(
-            title = "AI Signals",
-            subtitle = "Radar",
+            title = "Signals",
+            subtitle = "Rule-Based",
             icon = Icons.Default.CrisisAlert,
             accentColor = ColorGoldAccent,
             onClick = onAiSignalsClick,
             modifier = Modifier.weight(1f)
         )
         QuickActionItem(
-            title = "Market News",
-            subtitle = "Macro",
+            title = "News",
+            subtitle = "Calendar",
             icon = Icons.Default.Newspaper,
             accentColor = ColorAccentCyan,
             onClick = onMarketNewsClick,
@@ -591,7 +978,7 @@ fun QuickActionGrid(
             title = "Calculators",
             subtitle = "Lot & Pips",
             icon = Icons.Default.Calculate,
-            accentColor = Color(0xFFF59E0B),
+            accentColor = GoldAccentBright,
             onClick = onCalculatorsClick,
             modifier = Modifier.weight(1f)
         )
@@ -609,10 +996,10 @@ private fun QuickActionItem(
 ) {
     Surface(
         color = ColorSurfaceCard,
-        shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, ColorBorderDivider),
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
     ) {
         Column(
@@ -623,9 +1010,10 @@ private fun QuickActionItem(
         ) {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(34.dp)
                     .clip(CircleShape)
-                    .background(accentColor.copy(alpha = 0.15f)),
+                    .background(accentColor.copy(alpha = 0.15f))
+                    .border(1.dp, accentColor.copy(alpha = 0.35f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -655,10 +1043,6 @@ private fun QuickActionItem(
     }
 }
 
-/**
- * 2.4 Market Sessions Bar:
- * Horizontal indicator pill showing active sessions: London, New York, Tokyo (🟢 Active), Sydney.
- */
 @Composable
 fun MarketSessionsBar(
     sessions: List<Pair<String, Boolean>> = listOf(
@@ -671,14 +1055,14 @@ fun MarketSessionsBar(
 ) {
     Surface(
         color = ColorSurfaceCard,
-        shape = RoundedCornerShape(10.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, ColorBorderDivider),
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 9.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -715,25 +1099,20 @@ fun MarketSessionsBar(
     }
 }
 
-/**
- * 2.5 Horizontal Live Market Rates Ticker:
- * Continuous ticker tape moving from Right to Left with live pairs like EUR/USD, GBP/USD, BTC/USDT.
- */
 @Composable
 fun MarketTickerRow(
     rates: List<MarketTickerItem> = listOf(
         MarketTickerItem("EUR/USD", "1.08450", 0.42),
         MarketTickerItem("GBP/USD", "1.26110", -0.28),
-        MarketTickerItem("BTC/USDT", "$88,450", 2.85, isForex = false),
-        MarketTickerItem("USD/JPY", "154.220", 0.15),
-        MarketTickerItem("SOL/USDT", "$184.20", 4.12, isForex = false),
+        MarketTickerItem("BTC/USDT", "$67,432", 1.87, isForex = false),
+        MarketTickerItem("USD/JPY", "149.620", -0.12),
+        MarketTickerItem("SOL/USDT", "$142.67", 2.12, isForex = false),
         MarketTickerItem("XAU/USD", "$2,748.50", 0.65)
     ),
     onSelectSymbol: (String) -> Unit = {},
     colors: DashboardThemeColors = getDashboardColors(true),
     modifier: Modifier = Modifier
 ) {
-    // Duplicate rates to create an endless continuous scrolling marquee tape from Right to Left
     val displayRates = if (rates.isNotEmpty()) rates + rates + rates else rates
 
     Row(
@@ -752,10 +1131,10 @@ fun MarketTickerRow(
 
             Surface(
                 color = colors.surface,
-                shape = RoundedCornerShape(8.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, colors.border),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.dp, colors.border),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .clickable { onSelectSymbol(rate.symbol) }
             ) {
                 Row(
@@ -767,28 +1146,28 @@ fun MarketTickerRow(
                         color = colors.textPrimary,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = rate.price,
                         color = colors.textMuted,
                         fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(4.dp))
                             .background(changeColor.copy(alpha = 0.15f))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "$changeSign${String.format(Locale.US, "%.2f", rate.changePercent)}%",
                             color = changeColor,
-                            fontSize = 9.sp,
+                            fontSize = 9.5.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                     }
                 }
@@ -797,13 +1176,6 @@ fun MarketTickerRow(
     }
 }
 
-/**
- * 2.6 Smart Trading Signals Section (Choice B Layout):
- * - Header Row: Asset pair (e.g., EUR/USD), Action badge (BUY in green / SELL in red), and Status pill (e.g., ACTIVE 🟢).
- * - Entry Price row.
- * - Full-Term Target Section explicitly spelling out full names: "Stop Loss" (in red), "Take Profit 1" (in green), and "Take Profit 2" (in green).
- * - Free User Tier Lock: For free users, the Stop Loss and Take Profit targets must be hidden behind an aesthetic blurred overlay with an "Unlock VIP Targets" gold button.
- */
 @Composable
 fun ChoiceBSignalCard(
     signal: TechnicalSignal,
@@ -818,11 +1190,11 @@ fun ChoiceBSignalCard(
 
     Surface(
         color = ColorSurfaceCard,
-        shape = RoundedCornerShape(14.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, ColorBorderDivider),
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onToggleExpand)
             .testTag("choice_b_signal_${signal.id}")
     ) {
@@ -831,7 +1203,6 @@ fun ChoiceBSignalCard(
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
-            // Header Row: Pair + Action Badge + Status Pill
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -843,28 +1214,27 @@ fun ChoiceBSignalCard(
                         color = ColorTextWhite,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = JetBrainsMonoFont
                     )
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Action badge: BUY (green) / SELL (red)
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(actionColor)
-                            .padding(horizontal = 7.dp, vertical = 2.dp)
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = if (isBuy) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
                                 contentDescription = null,
-                                tint = Color.Black,
+                                tint = Color(0xFF060D1A),
                                 modifier = Modifier.size(11.dp)
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = signal.action.uppercase(),
-                                color = Color.Black,
+                                color = Color(0xFF060D1A),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black
                             )
@@ -872,7 +1242,6 @@ fun ChoiceBSignalCard(
                     }
                 }
 
-                // Status pill: ACTIVE 🟢
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
@@ -900,7 +1269,6 @@ fun ChoiceBSignalCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Entry Price Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -917,28 +1285,24 @@ fun ChoiceBSignalCard(
                     color = ColorTextWhite,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = JetBrainsMonoFont
                 )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Full-Term Target Section explicitly spelling out full names:
-            // "Stop Loss", "Take Profit 1", "Take Profit 2"
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(ColorScreenBackground)
-                    .border(1.dp, ColorBorderDivider, RoundedCornerShape(10.dp))
+                    .border(1.dp, ColorBorderDivider, RoundedCornerShape(12.dp))
                     .padding(10.dp)
             ) {
-                // Underlying targets grid
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Stop Loss Column
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Stop Loss",
@@ -952,11 +1316,10 @@ fun ChoiceBSignalCard(
                             color = ColorLossRed,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                     }
 
-                    // Take Profit 1 Column
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -973,11 +1336,10 @@ fun ChoiceBSignalCard(
                             color = ColorProfitGreen,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                     }
 
-                    // Take Profit 2 Column
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.End
@@ -994,12 +1356,11 @@ fun ChoiceBSignalCard(
                             color = ColorProfitGreen,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = JetBrainsMonoFont
                         )
                     }
                 }
 
-                // Free User Tier Lock: Aesthetic blurred overlay with "Unlock VIP Targets"
                 if (signal.isLockedForFree) {
                     Box(
                         modifier = Modifier
@@ -1018,20 +1379,20 @@ fun ChoiceBSignalCard(
                         Button(
                             onClick = onUnlockVipClick,
                             colors = ButtonDefaults.buttonColors(containerColor = ColorGoldAccent),
-                            shape = RoundedCornerShape(8.dp),
+                            shape = RoundedCornerShape(18.dp),
                             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-                            modifier = Modifier.height(32.dp)
+                            modifier = Modifier.height(34.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Unlock",
-                                tint = Color.Black,
+                                contentDescription = "Reveal",
+                                tint = Color(0xFF060D1A),
                                 modifier = Modifier.size(13.dp)
                             )
                             Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                text = "Unlock VIP Targets",
-                                color = Color.Black,
+                                text = "Reveal Educational Targets",
+                                color = Color(0xFF060D1A),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
@@ -1040,7 +1401,6 @@ fun ChoiceBSignalCard(
                 }
             }
 
-            // Expandable details section upon tap
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = expandVertically() + fadeIn(),
@@ -1063,8 +1423,8 @@ fun ChoiceBSignalCard(
                     Text(
                         text = signal.reasoning,
                         color = ColorMutedSlate,
-                        fontSize = 10.sp,
-                        lineHeight = 14.sp
+                        fontSize = 10.5.sp,
+                        lineHeight = 15.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -1073,7 +1433,7 @@ fun ChoiceBSignalCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Potential: ◎ ${signal.pipPotential}p • ${signal.timeframe}",
+                            text = "Sample Range: ◎ ${signal.pipPotential}p • ${signal.timeframe}",
                             color = ColorProfitGreen,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
@@ -1081,10 +1441,10 @@ fun ChoiceBSignalCard(
                         Button(
                             onClick = onOpenGraphClick,
                             colors = ButtonDefaults.buttonColors(containerColor = ColorScreenBackground),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, ColorAccentCyan),
-                            shape = RoundedCornerShape(6.dp),
+                            border = BorderStroke(1.dp, ColorAccentCyan),
+                            shape = RoundedCornerShape(10.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                            modifier = Modifier.height(28.dp)
+                            modifier = Modifier.height(30.dp)
                         ) {
                             Icon(Icons.Default.CandlestickChart, contentDescription = null, tint = ColorAccentCyan, modifier = Modifier.size(13.dp))
                             Spacer(modifier = Modifier.width(4.dp))
@@ -1097,70 +1457,70 @@ fun ChoiceBSignalCard(
     }
 }
 
-/**
- * 2.7 Bottom Navigation Bar:
- * 5 icons with text tabs: Pulse (active gold), Live Rates, Signals, News, Settings.
- */
 @Composable
 fun PipBeaconBottomNav(
     selectedTab: String = "home",
     onTabSelect: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(
-        containerColor = ColorSurfaceCard,
-        tonalElevation = 6.dp,
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .border(androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider))
+            .background(NavySurface)
+            .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        val navItems = listOf(
-            Triple("home", "Pulse", Icons.Default.Dashboard),
-            Triple("rates", "Markets", Icons.AutoMirrored.Filled.TrendingUp),
-            Triple("signals", "Signals", Icons.Default.CrisisAlert),
-            Triple("news", "News", Icons.Default.Newspaper),
-            Triple("profile", "Profile", Icons.Default.Person)
-        )
-
-        navItems.forEach { (route, title, icon) ->
-            val isSelected = selectedTab == route
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = { onTabSelect(route) },
-                icon = {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = title,
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        text = title,
-                        fontSize = 10.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.Black,
-                    selectedTextColor = ColorGoldAccent,
-                    indicatorColor = ColorGoldAccent,
-                    unselectedIconColor = ColorMutedSlate,
-                    unselectedTextColor = ColorMutedSlate
-                ),
-                modifier = Modifier.testTag("bottom_nav_$route")
+        HorizontalDivider(color = NavyBorder, thickness = 1.dp)
+        NavigationBar(
+            containerColor = NavySurface,
+            tonalElevation = 0.dp
+        ) {
+            val navItems = listOf(
+                Triple("home", "Home", Icons.Default.Home),
+                Triple("rates", "Markets", Icons.AutoMirrored.Filled.TrendingUp),
+                Triple("signals", "Signals", Icons.Default.CrisisAlert),
+                Triple("news", "News", Icons.Default.Newspaper),
+                Triple("profile", "Profile", Icons.Default.Person)
             )
+
+            navItems.forEach { (route, title, icon) ->
+                val isSelected = selectedTab == route
+                NavigationBarItem(
+                    selected = isSelected,
+                    onClick = { onTabSelect(route) },
+                    icon = {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = title,
+                            modifier = Modifier.size(21.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = title,
+                            fontSize = 10.sp,
+                            maxLines = 1,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFF060D1A),
+                        selectedTextColor = GoldAccentBright,
+                        indicatorColor = GoldAccent,
+                        unselectedIconColor = TextMuted,
+                        unselectedTextColor = TextMuted
+                    ),
+                    modifier = Modifier.testTag("bottom_nav_$route")
+                )
+            }
         }
     }
 }
 
 // =============================================================================
-// MAIN PRODUCTION-READY DASHBOARD COMPOSABLE (PipBeacon: Market Pulse)
+// MAIN SHOWCASE DASHBOARD COMPOSABLE
 // =============================================================================
-
 @Composable
 fun HomeScreen(
-    // Data inputs (with rich production defaults)
     forexItems: List<MarketItem> = emptyList(),
     cryptoItems: List<MarketItem> = emptyList(),
     signals: List<SignalItem> = emptyList(),
@@ -1187,6 +1547,8 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateToForexAcademy: () -> Unit = {},
     onNavigateToCryptoAcademy: () -> Unit = {},
+    onNavigateToJournal: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var pulseFilter by remember { mutableStateOf("All") }
@@ -1195,7 +1557,6 @@ fun HomeScreen(
 
     val colors = getDashboardColors(isDarkTheme)
 
-    // Exactly 3 Preview Signals (Choice B Layout with Full Terminology)
     var previewSignals by remember {
         mutableStateOf(
             listOf(
@@ -1203,21 +1564,21 @@ fun HomeScreen(
                     id = "sig_1",
                     symbol = "EUR/USD",
                     action = "BUY",
-                    status = "ACTIVE 🟢",
-                    entryPrice = 1.08450,
-                    stopLoss = 1.08150,
-                    takeProfit1 = 1.08950,
-                    takeProfit2 = 1.09450,
-                    isLockedForFree = true,
-                    pipPotential = 50,
+                    status = "ACTIVE",
+                    entryPrice = 1.08200,
+                    stopLoss = 1.07900,
+                    takeProfit1 = 1.08500,
+                    takeProfit2 = 1.08900,
+                    isLockedForFree = false,
+                    pipPotential = 70,
                     timeframe = "H1",
-                    reasoning = "Bullish momentum bounce above 50 EMA on H1 timeframe with positive RSI divergence."
+                    reasoning = "Bullish trend with support near 1.0800 and positive RSI divergence."
                 ),
                 TechnicalSignal(
                     id = "sig_2",
                     symbol = "XAU/USD",
                     action = "BUY",
-                    status = "ACTIVE 🟢",
+                    status = "ACTIVE",
                     entryPrice = 2742.80,
                     stopLoss = 2728.00,
                     takeProfit1 = 2765.00,
@@ -1225,27 +1586,26 @@ fun HomeScreen(
                     isLockedForFree = true,
                     pipPotential = 360,
                     timeframe = "H4",
-                    reasoning = "Safe-haven gold demand breakout past $2,735 resistance with strong volume confirmation."
+                    reasoning = "Safe-haven demand breakout past $2,735 resistance with ATR confirmation."
                 ),
                 TechnicalSignal(
                     id = "sig_3",
                     symbol = "BTC/USDT",
                     action = "SELL",
-                    status = "ACTIVE 🟢",
-                    entryPrice = 88450.0,
-                    stopLoss = 89900.0,
-                    takeProfit1 = 86200.0,
-                    takeProfit2 = 84500.0,
+                    status = "ACTIVE",
+                    entryPrice = 67432.0,
+                    stopLoss = 68200.0,
+                    takeProfit1 = 66100.0,
+                    takeProfit2 = 64800.0,
                     isLockedForFree = true,
                     pipPotential = 2250,
                     timeframe = "M15",
-                    reasoning = "Overbought RSI 76 rejection at $88.5k with bearish MACD divergence."
+                    reasoning = "Overbought RSI 74 rejection at local supply with bearish MACD cross."
                 )
             )
         )
     }
 
-    // Horizontal Ticker items dynamically mapped from live backend feeds
     val tickerItems = remember(forexItems, cryptoItems) {
         val list = mutableListOf<MarketTickerItem>()
         forexItems.filter { it.currentPrice != null }.take(6).forEach {
@@ -1263,12 +1623,11 @@ fun HomeScreen(
             list
         } else {
             listOf(
-                MarketTickerItem("EUR/USD", "1.08450", 0.42),
-                MarketTickerItem("GBP/USD", "1.26110", -0.28),
-                MarketTickerItem("BTC/USDT", "$88,450", 2.85, isForex = false),
-                MarketTickerItem("USD/JPY", "154.220", 0.15),
-                MarketTickerItem("SOL/USDT", "$184.20", 4.12, isForex = false),
-                MarketTickerItem("XAU/USD", "$2,748.50", 0.65)
+                MarketTickerItem("EUR/USD", "1.08250", 0.34),
+                MarketTickerItem("GBP/USD", "1.27340", 0.18),
+                MarketTickerItem("BTC/USDT", "$67,432", 1.87, isForex = false),
+                MarketTickerItem("USD/JPY", "149.620", -0.12),
+                MarketTickerItem("SOL/USDT", "$142.67", 2.12, isForex = false)
             )
         }
     }
@@ -1279,13 +1638,14 @@ fun HomeScreen(
             .background(colors.background),
         topBar = {
             PipBeaconHeader(
-                title = "PipBeacon: Market Pulse",
-                statusText = if (providerStatus is DataResult.Success) "Live / Demo Data • Offline Ready" else "Demo Data • Offline Ready",
+                title = "PipBeacon",
+                statusText = if (providerStatus is DataResult.Success) "Live / Demo Data • Offline Ready" else "Offline Demo Data",
                 isRefreshing = isRefreshing,
                 isDarkTheme = isDarkTheme,
                 onToggleTheme = onToggleTheme,
                 onCalculatorClick = onOpenCalculator,
                 onRefreshClick = onRefresh,
+                onProfileClick = onNavigateToProfile,
                 colors = colors
             )
         },
@@ -1306,282 +1666,340 @@ fun HomeScreen(
         },
         containerColor = colors.background
     ) { innerPadding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(NavyBackground, NavyBackgroundBottom)))
                 .padding(innerPadding)
-                .background(colors.background)
-                .testTag("dashboard_screen"),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 2. Hero Win Rate & Metrics Card
-            item {
-                WinRateHeroCard(
-                    winRate = 86,
-                    activeCount = 5,
-                    totalPips = "+9927 PIPS",
-                    tpHits = 100,
-                    totalSignals = 121,
-                    selectedFilter = pulseFilter,
-                    onFilterSelect = { pulseFilter = it }
-                )
-            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("dashboard_screen"),
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // 1. Showcase Hero Banner Card ("Trade Smarter with PipBeacon" + Lighthouse)
+                item {
+                    ShowcaseDashboardHeroCard(
+                        onLearnMoreClick = onNavigateToForexAcademy,
+                        colors = colors
+                    )
+                }
 
-            // Task 2: Rates ticker moved directly after the Win Rate windows section
-            item {
-                Column {
+                // 2. Markets Overview ("See All >" + Sparkline rows)
+                item {
+                    ShowcaseMarketsOverviewSection(
+                        items = forexItems + cryptoItems,
+                        onSeeAllClick = onNavigateToLiveRates,
+                        onSelectSymbol = onAnalyzeSymbol,
+                        colors = colors
+                    )
+                }
+
+                // 3. Quick Access Circular Rings (Learn, Analysis, Signals, News)
+                item {
+                    ShowcaseQuickAccessRings(
+                        onLearnClick = onNavigateToForexAcademy,
+                        onAnalysisClick = { onAnalyzeSymbol("EUR/USD") },
+                        onSignalsClick = onNavigateToSignals,
+                        onNewsClick = onNavigateToAiNews,
+                        colors = colors
+                    )
+                }
+
+                // 4. Academy Tracks Row (Forex Academy & Crypto Academy)
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Surface(
+                            color = ColorSurfaceCard,
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, ColorBorderDivider),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .clickable(onClick = onNavigateToForexAcademy)
+                                .testTag("home_forex_academy_card")
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(ColorAccentCyan.copy(alpha = 0.15f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CurrencyExchange,
+                                        contentDescription = "Forex Academy",
+                                        tint = ColorAccentCyan,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "Forex Academy",
+                                        color = ColorTextWhite,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = "6 Offline Modules",
+                                        color = ColorMutedSlate,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        Surface(
+                            color = ColorSurfaceCard,
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, ColorBorderDivider),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .clickable(onClick = onNavigateToCryptoAcademy)
+                                .testTag("home_crypto_academy_card")
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(ColorGoldAccent.copy(alpha = 0.15f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CurrencyBitcoin,
+                                        contentDescription = "Crypto Academy",
+                                        tint = ColorGoldAccent,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "Crypto Academy",
+                                        color = ColorTextWhite,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = "6 Offline Modules",
+                                        color = ColorMutedSlate,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 5. Practice Tools Row (Calculators, Journal, Economic Calendar)
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        QuickActionItem(
+                            title = "Calculators",
+                            subtitle = "Pip & Lots",
+                            icon = Icons.Default.Calculate,
+                            accentColor = ColorGoldAccent,
+                            onClick = onNavigateToCalculators,
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickActionItem(
+                            title = "Journal",
+                            subtitle = "Study Log",
+                            icon = Icons.Default.Book,
+                            accentColor = ColorProfitGreen,
+                            onClick = onNavigateToJournal,
+                            modifier = Modifier.weight(1f).testTag("home_journal_card")
+                        )
+                        QuickActionItem(
+                            title = "Calendar",
+                            subtitle = "Macro Events",
+                            icon = Icons.Default.CalendarMonth,
+                            accentColor = ColorAccentCyan,
+                            onClick = onNavigateToCalendar,
+                            modifier = Modifier.weight(1f).testTag("home_calendar_card")
+                        )
+                    }
+                }
+
+                // 6. Win Rate & Educational Track Record Window
+                item {
+                    WinRateHeroCard(
+                        winRate = 86,
+                        activeCount = 5,
+                        totalPips = "+9927 PIPS",
+                        tpHits = 100,
+                        totalSignals = 121,
+                        selectedFilter = pulseFilter,
+                        onFilterSelect = { pulseFilter = it }
+                    )
+                }
+
+                // 7. Continuous Live/Demo Rates Ticker directly after Win Rate window
+                item {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "MARKET TICKER",
+                                color = ColorMutedSlate,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.5.sp
+                            )
+                            Text(
+                                text = "Tap pair for chart",
+                                color = ColorAccentCyan,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        MarketTickerRow(
+                            rates = tickerItems,
+                            onSelectSymbol = onAnalyzeSymbol,
+                            colors = colors
+                        )
+                    }
+                }
+
+                // 8. Market Sessions Bar
+                item {
+                    MarketSessionsBar()
+                }
+
+                // 9. Forex ATR Signal Engine Card
+                item {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .clickable(onClick = onNavigateToSignalEngine)
+                            .testTag("home_launch_signal_engine_button"),
+                        color = ColorSurfaceCard,
+                        border = BorderStroke(1.dp, ColorGoldAccent.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(ColorGoldAccent.copy(alpha = 0.15f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Radar,
+                                        contentDescription = null,
+                                        tint = ColorGoldAccent,
+                                        modifier = Modifier.size(19.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Forex ATR Signal Engine",
+                                        color = ColorTextWhite,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "RSI(14) • EMA(20/50) • MACD • TP1/2/3",
+                                        color = ColorMutedSlate,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(ColorGoldAccent)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                            ) {
+                                Text("OPEN", color = Color(0xFF060D1A), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                            }
+                        }
+                    }
+                }
+
+                // 10. Smart Trading Signals Preview Section
+                item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "LIVE MARKET RATES",
-                            color = ColorMutedSlate,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
+                            text = "Educational Signal Setups",
+                            color = ColorTextWhite,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Tap pair for graph",
+                            text = "View All →",
                             color = ColorAccentCyan,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clickable(onClick = onNavigateToSignals)
+                                .padding(4.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    MarketTickerRow(
-                        rates = tickerItems,
-                        onSelectSymbol = onAnalyzeSymbol,
-                        colors = colors
+                }
+
+                items(previewSignals, key = { it.id }) { signal ->
+                    ChoiceBSignalCard(
+                        signal = signal,
+                        isExpanded = expandedSignalId == signal.id,
+                        onToggleExpand = {
+                            expandedSignalId = if (expandedSignalId == signal.id) null else signal.id
+                        },
+                        onUnlockVipClick = {
+                            previewSignals = previewSignals.map {
+                                if (it.id == signal.id) it.copy(isLockedForFree = false) else it
+                            }
+                        },
+                        onOpenGraphClick = {
+                            onAnalyzeSymbol(signal.symbol)
+                        }
                     )
                 }
-            }
 
-            // 3. Quick Action Grid (Live Rates, AI Signals, Market News, Calculators)
-            item {
-                QuickActionGrid(
-                    onLiveRatesClick = onNavigateToLiveRates,
-                    onAiSignalsClick = onNavigateToSignals,
-                    onMarketNewsClick = onNavigateToAiNews,
-                    onCalculatorsClick = onNavigateToCalculators
-                )
-            }
-
-            // 3b. Academy Learning Hub (Forex Academy & Crypto Academy)
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Surface(
-                        color = ColorSurfaceCard,
-                        shape = RoundedCornerShape(12.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable(onClick = onNavigateToForexAcademy)
-                            .testTag("home_forex_academy_card")
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(ColorAccentCyan.copy(alpha = 0.15f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CurrencyExchange,
-                                    contentDescription = "Forex Academy",
-                                    tint = ColorAccentCyan,
-                                    modifier = Modifier.size(17.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column {
-                                Text(
-                                    text = "Forex Academy",
-                                    color = ColorTextWhite,
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = "6 Offline Modules",
-                                    color = ColorMutedSlate,
-                                    fontSize = 9.5.sp
-                                )
-                            }
-                        }
-                    }
-
-                    Surface(
-                        color = ColorSurfaceCard,
-                        shape = RoundedCornerShape(12.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, ColorBorderDivider),
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable(onClick = onNavigateToCryptoAcademy)
-                            .testTag("home_crypto_academy_card")
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(ColorGoldAccent.copy(alpha = 0.15f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CurrencyBitcoin,
-                                    contentDescription = "Crypto Academy",
-                                    tint = ColorGoldAccent,
-                                    modifier = Modifier.size(17.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column {
-                                Text(
-                                    text = "Crypto Academy",
-                                    color = ColorTextWhite,
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = "6 Offline Modules",
-                                    color = ColorMutedSlate,
-                                    fontSize = 9.5.sp
-                                )
-                            }
-                        }
-                    }
+                item {
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
-            }
-
-            // 4. Market Sessions Bar (London, New York, Tokyo Active, Sydney)
-            item {
-                MarketSessionsBar()
-            }
-
-            // 6. Smart Trading Signals Section (Choice B Layout)
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Smart Trading Signals - Tap row to expand",
-                        color = ColorTextWhite,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "View All (9) ->",
-                        color = ColorAccentCyan,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .clickable(onClick = onNavigateToSignals)
-                            .padding(4.dp)
-                    )
-                }
-            }
-
-            // Launch Forex ATR Signal Engine Action Card
-            item {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable(onClick = onNavigateToSignalEngine)
-                        .testTag("home_launch_signal_engine_button"),
-                    color = ColorSurfaceCard,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, ColorGoldAccent.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(ColorGoldAccent.copy(alpha = 0.15f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Radar,
-                                    contentDescription = null,
-                                    tint = ColorGoldAccent,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = "Forex ATR Signal Engine",
-                                    color = ColorTextWhite,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "RSI(14) • EMA(20/50) • MACD • Multi-Tier TP1/2/3",
-                                    color = ColorMutedSlate,
-                                    fontSize = 10.sp
-                                )
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(ColorGoldAccent)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text("ENGINE ➔", color = Color.Black, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-
-            // Exactly 3 Preview Signal Cards (Choice B Layout)
-            items(previewSignals, key = { it.id }) { signal ->
-                ChoiceBSignalCard(
-                    signal = signal,
-                    isExpanded = expandedSignalId == signal.id,
-                    onToggleExpand = {
-                        expandedSignalId = if (expandedSignalId == signal.id) null else signal.id
-                    },
-                    onUnlockVipClick = {
-                        // Toggle VIP unlock for demonstration
-                        previewSignals = previewSignals.map {
-                            if (it.id == signal.id) it.copy(isLockedForFree = false) else it
-                        }
-                    },
-                    onOpenGraphClick = {
-                        onAnalyzeSymbol(signal.symbol)
-                    }
-                )
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

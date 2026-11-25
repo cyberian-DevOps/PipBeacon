@@ -2,7 +2,6 @@ package com.pipbeacon.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -21,8 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -44,19 +40,23 @@ import androidx.compose.ui.window.Dialog
 import com.pipbeacon.app.core.DataResult
 import com.pipbeacon.app.data.MarketItem
 import com.pipbeacon.app.ui.components.MarketItemCard
+import com.pipbeacon.app.ui.components.ShowcaseBackground
+import com.pipbeacon.app.ui.components.ShowcaseGoldButton
 import com.pipbeacon.app.ui.components.SignalBadge
 import com.pipbeacon.app.ui.components.WaitingForProviderCard
+import com.pipbeacon.app.ui.theme.CyanAccent
+import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorBuy
 import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.IndicatorSell
-import com.pipbeacon.app.ui.theme.NavyBackground
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
 import com.pipbeacon.app.ui.theme.NavySurface
-import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextMuted
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
+import java.util.Locale
 
 @Composable
 fun ForexMarketsScreen(
@@ -74,113 +74,104 @@ fun ForexMarketsScreen(
 ) {
     val categories = listOf("All", "Major", "Minor")
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .testTag("forex_screen")
-    ) {
-        // Search & Filter header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = onSearchChange,
-                placeholder = { Text("Search Forex pairs (e.g. EUR/USD)", fontSize = 13.sp) },
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = "Search", tint = TextMuted)
-                },
-                trailingIcon = {
-                    if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { onSearchChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextMuted)
-                        }
-                    }
-                },
-                singleLine = true,
+    ShowcaseBackground(modifier = modifier.testTag("forex_screen")) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("forex_search_field"),
-                shape = RoundedCornerShape(10.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TealAccent,
-                    unfocusedBorderColor = NavyBorder,
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedContainerColor = NavySurface,
-                    unfocusedContainerColor = NavySurface
-                )
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Category Chips
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(categories) { cat ->
-                    val isSelected = categoryFilter == cat
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { onCategoryChange(cat) },
-                        label = { Text(cat, fontSize = 12.sp) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = TealAccent,
-                            selectedLabelColor = Color.Black,
-                            containerColor = NavySurface,
-                            labelColor = TextSecondary
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = isSelected,
-                            borderColor = if (isSelected) TealAccent else NavyBorder
-                        )
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchChange,
+                    placeholder = { Text("Search Forex pairs (e.g. EUR/USD)", fontSize = 13.sp, color = TextMuted) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = CyanAccent) },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { onSearchChange("") }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextMuted)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("forex_search_field"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = GoldAccentBright,
+                        unfocusedBorderColor = NavyBorder,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = NavyCard,
+                        unfocusedContainerColor = NavyCard
                     )
-                }
-            }
-        }
+                )
 
-        // List
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (providerStatus !is DataResult.Success) {
-                item {
-                    WaitingForProviderCard(onConfigureClick = onNavigateToSettings)
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-            }
+                Spacer(modifier = Modifier.height(10.dp))
 
-            if (items.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No forex pairs match your search.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(categories) { cat ->
+                        val isSelected = categoryFilter == cat
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onCategoryChange(cat) },
+                            label = { Text(cat, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = GoldAccentBright,
+                                selectedLabelColor = Color(0xFF060D1A),
+                                containerColor = NavyCard,
+                                labelColor = TextSecondary
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) GoldAccentBright else NavyBorder
+                            )
                         )
                     }
                 }
-            } else {
-                items(items) { item ->
-                    MarketItemCard(
-                        item = item,
-                        onClick = { onSelectItem(item) }
-                    )
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (providerStatus !is DataResult.Success) {
+                    item {
+                        WaitingForProviderCard(onConfigureClick = onNavigateToSettings)
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                if (items.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No forex pairs match your search.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextMuted
+                            )
+                        }
+                    }
+                } else {
+                    items(items) { item ->
+                        MarketItemCard(
+                            item = item,
+                            onClick = { onSelectItem(item) }
+                        )
+                    }
                 }
             }
         }
     }
 
-    // Detail Dialog
     selectedItem?.let { item ->
         MarketDetailDialog(
             item = item,
@@ -203,9 +194,9 @@ fun MarketDetailDialog(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(18.dp))
                 .background(NavySurface)
-                .border(1.dp, NavyBorder, RoundedCornerShape(16.dp))
+                .border(1.dp, NavyBorder, RoundedCornerShape(18.dp))
                 .padding(20.dp)
         ) {
             Column {
@@ -237,45 +228,43 @@ fun MarketDetailDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(NavyCard)
-                        .border(1.dp, NavyBorder, RoundedCornerShape(10.dp))
+                        .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
                         .padding(14.dp)
                 ) {
-                    Column {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Category:", style = MaterialTheme.typography.bodySmall, color = TextMuted)
-                            Text(item.category, style = MaterialTheme.typography.labelSmall, color = TealAccent)
+                            Text(item.category, style = MaterialTheme.typography.labelSmall, color = CyanAccent)
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Market Status:", style = MaterialTheme.typography.bodySmall, color = TextMuted)
                             Text(
-                                if (item.isProviderLive) "Live Provider Active" else "Waiting for permitted provider",
+                                if (item.isProviderLive) "Feed Active" else "Offline Demo Mode",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = if (item.isProviderLive) IndicatorBuy else IndicatorNeutral
                             )
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Current Price:", style = MaterialTheme.typography.bodySmall, color = TextMuted)
                             Text(
-                                if (item.currentPrice != null) String.format("%.4f", item.currentPrice) else "Waiting for provider",
-                                style = MaterialTheme.typography.labelSmall,
+                                if (item.currentPrice != null) String.format(Locale.US, "%.4f", item.currentPrice) else "Unavailable",
+                                fontFamily = JetBrainsMonoFont,
+                                fontSize = 12.sp,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -284,17 +273,15 @@ fun MarketDetailDialog(
                             SignalBadge(signal = item.signalSummary)
                         }
                         if (item.providerName != null) {
-                            Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Data Provider:", style = MaterialTheme.typography.bodySmall, color = TextMuted)
-                                Text(item.providerName, style = MaterialTheme.typography.labelSmall, color = TealAccent)
+                                Text("Data Source:", style = MaterialTheme.typography.bodySmall, color = TextMuted)
+                                Text(item.providerName, style = MaterialTheme.typography.labelSmall, color = CyanAccent)
                             }
                         }
                         if (item.quoteTimestamp != null) {
-                            Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -313,16 +300,14 @@ fun MarketDetailDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
+                ShowcaseGoldButton(
+                    text = "Open Chart Analysis",
                     onClick = onAnalyze,
+                    trailingArrow = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("analyze_pair_button"),
-                    colors = ButtonDefaults.buttonColors(containerColor = TealAccent, contentColor = Color.Black),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Open Full Technical Analysis", style = MaterialTheme.typography.labelMedium)
-                }
+                        .testTag("analyze_pair_button")
+                )
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.pipbeacon.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,10 +31,14 @@ import com.pipbeacon.app.indicators.Candle
 import com.pipbeacon.app.indicators.MovingAveragesCalculator
 import com.pipbeacon.app.ui.theme.CandleBearish
 import com.pipbeacon.app.ui.theme.CandleBullish
+import com.pipbeacon.app.ui.theme.CyanAccent
+import com.pipbeacon.app.ui.theme.GoldAccentBright
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
-import com.pipbeacon.app.ui.theme.TealAccent
+import com.pipbeacon.app.ui.theme.NavySurfaceVariant
 import com.pipbeacon.app.ui.theme.TextMuted
+import java.util.Locale
 
 @Composable
 fun InteractiveCandlestickChart(
@@ -42,20 +50,21 @@ fun InteractiveCandlestickChart(
     modifier: Modifier = Modifier
 ) {
     if (candles.isEmpty()) {
-        Box(
+        Surface(
             modifier = modifier
                 .fillMaxWidth()
-                .height(240.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(NavyCard)
-                .border(1.dp, NavyBorder, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
+                .height(250.dp),
+            color = NavySurfaceVariant,
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, NavyBorder)
         ) {
-            Text(
-                text = "No candle data available",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextMuted
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = "No candle data available",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextMuted
+                )
+            }
         }
         return
     }
@@ -67,173 +76,204 @@ fun InteractiveCandlestickChart(
 
     val minPrice = candles.minOf { it.low }
     val maxPrice = candles.maxOf { it.high }
-    val priceRange = if (maxPrice - minPrice == 0.0) 1.0 else (maxPrice - minPrice) * 1.05
+    val priceRange = if (maxPrice - minPrice == 0.0) 1.0 else (maxPrice - minPrice) * 1.06
 
-    Box(
+    val lineCyan = CyanAccent
+    val gridColor = NavyBorder.copy(alpha = 0.45f)
+
+    Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(240.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(NavyCard)
-            .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
-            .padding(8.dp)
+            .height(250.dp),
+        color = NavySurfaceVariant,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, NavyBorder)
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val width = size.width
-            val height = size.height
-            val candleCount = candles.size
-            val candleWidth = (width / candleCount) * 0.7f
-            val candleStep = width / candleCount
-
-            fun priceToY(price: Double): Float {
-                val norm = ((price - minPrice) / priceRange).toFloat()
-                return height - (norm * height)
-            }
-
-            // Draw grid lines
-            val gridLines = 4
-            for (g in 0..gridLines) {
-                val y = height * (g.toFloat() / gridLines)
-                drawLine(
-                    color = Color(0x1FFFFFFF),
-                    start = Offset(0f, y),
-                    end = Offset(width, y),
-                    strokeWidth = 1f
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(NavyCard.copy(alpha = 0.65f), NavySurfaceVariant)
+                    )
                 )
-            }
+                .padding(10.dp)
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val width = size.width
+                val height = size.height
+                val candleCount = candles.size
+                val candleWidth = (width / candleCount) * 0.64f
+                val candleStep = width / candleCount
 
-            // Draw Bollinger Bands channel if enabled
-            if (showBollinger && bbSeries.isNotEmpty()) {
-                val upperPath = Path()
-                val lowerPath = Path()
-                val offsetIdx = candleCount - bbSeries.size
-
-                bbSeries.forEachIndexed { i, bb ->
-                    val x = (offsetIdx + i) * candleStep + (candleStep / 2f)
-                    val yUp = priceToY(bb.upperBand)
-                    val yLow = priceToY(bb.lowerBand)
-                    if (i == 0) {
-                        upperPath.moveTo(x, yUp)
-                        lowerPath.moveTo(x, yLow)
-                    } else {
-                        upperPath.lineTo(x, yUp)
-                        lowerPath.lineTo(x, yLow)
-                    }
+                fun priceToY(price: Double): Float {
+                    val norm = ((price - minPrice) / priceRange).toFloat()
+                    return height - (norm * height)
                 }
-                drawPath(
-                    path = upperPath,
-                    color = Color(0xFF64B5F6).copy(alpha = 0.6f),
-                    style = Stroke(width = 1.5.dp.toPx())
-                )
-                drawPath(
-                    path = lowerPath,
-                    color = Color(0xFF64B5F6).copy(alpha = 0.6f),
-                    style = Stroke(width = 1.5.dp.toPx())
-                )
-            }
 
-            // Draw Candlesticks or Area Line
-            if (isCandleMode) {
-                candles.forEachIndexed { index, c ->
-                    val x = index * candleStep + (candleStep / 2f)
-                    val isUp = c.close >= c.open
-                    val color = if (isUp) CandleBullish else CandleBearish
-
-                    val yHigh = priceToY(c.high)
-                    val yLow = priceToY(c.low)
-                    val yOpen = priceToY(c.open)
-                    val yClose = priceToY(c.close)
-
-                    // Wick
+                // Subtle gridlines
+                val gridLines = 4
+                for (g in 0..gridLines) {
+                    val y = height * (g.toFloat() / gridLines)
                     drawLine(
-                        color = color,
-                        start = Offset(x, yHigh),
-                        end = Offset(x, yLow),
-                        strokeWidth = 1.5.dp.toPx()
-                    )
-
-                    // Body
-                    val bodyTop = minOf(yOpen, yClose)
-                    val bodyHeight = maxOf(Math.abs(yClose - yOpen), 2.5f)
-                    drawRect(
-                        color = color,
-                        topLeft = Offset(x - (candleWidth / 2f), bodyTop),
-                        size = Size(candleWidth, bodyHeight)
+                        color = gridColor,
+                        start = Offset(0f, y),
+                        end = Offset(width, y),
+                        strokeWidth = 1f
                     )
                 }
-            } else {
-                val linePath = Path()
-                candles.forEachIndexed { index, c ->
-                    val x = index * candleStep + (candleStep / 2f)
-                    val y = priceToY(c.close)
-                    if (index == 0) linePath.moveTo(x, y) else linePath.lineTo(x, y)
-                }
-                drawPath(
-                    path = linePath,
-                    color = TealAccent,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
 
-            // Draw SMA 20 Overlay (Teal)
-            if (showSma && smaSeries.isNotEmpty()) {
-                val smaPath = Path()
-                var started = false
-                smaSeries.forEachIndexed { i, valSma ->
-                    if (!valSma.isNaN()) {
-                        val x = i * candleStep + (candleStep / 2f)
-                        val y = priceToY(valSma)
-                        if (!started) {
-                            smaPath.moveTo(x, y)
-                            started = true
+                // Bollinger Bands channel
+                if (showBollinger && bbSeries.isNotEmpty()) {
+                    val upperPath = Path()
+                    val lowerPath = Path()
+                    val offsetIdx = candleCount - bbSeries.size
+
+                    bbSeries.forEachIndexed { i, bb ->
+                        val x = (offsetIdx + i) * candleStep + (candleStep / 2f)
+                        val yUp = priceToY(bb.upperBand)
+                        val yLow = priceToY(bb.lowerBand)
+                        if (i == 0) {
+                            upperPath.moveTo(x, yUp)
+                            lowerPath.moveTo(x, yLow)
                         } else {
-                            smaPath.lineTo(x, y)
+                            upperPath.lineTo(x, yUp)
+                            lowerPath.lineTo(x, yLow)
                         }
                     }
+                    drawPath(
+                        path = upperPath,
+                        color = Color(0xFF64B5F6).copy(alpha = 0.65f),
+                        style = Stroke(width = 1.5.dp.toPx(), cap = StrokeCap.Round)
+                    )
+                    drawPath(
+                        path = lowerPath,
+                        color = Color(0xFF64B5F6).copy(alpha = 0.65f),
+                        style = Stroke(width = 1.5.dp.toPx(), cap = StrokeCap.Round)
+                    )
                 }
-                drawPath(
-                    path = smaPath,
-                    color = TealAccent,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
 
-            // Draw EMA 50 Overlay (Amber/Orange)
-            if (showEma && emaSeries.isNotEmpty()) {
-                val emaPath = Path()
-                var started = false
-                emaSeries.forEachIndexed { i, valEma ->
-                    if (!valEma.isNaN()) {
-                        val x = i * candleStep + (candleStep / 2f)
-                        val y = priceToY(valEma)
-                        if (!started) {
-                            emaPath.moveTo(x, y)
-                            started = true
+                // Candlesticks or Area Line
+                if (isCandleMode) {
+                    candles.forEachIndexed { index, c ->
+                        val x = index * candleStep + (candleStep / 2f)
+                        val isUp = c.close >= c.open
+                        val color = if (isUp) CandleBullish else CandleBearish
+
+                        val yHigh = priceToY(c.high)
+                        val yLow = priceToY(c.low)
+                        val yOpen = priceToY(c.open)
+                        val yClose = priceToY(c.close)
+
+                        drawLine(
+                            color = color,
+                            start = Offset(x, yHigh),
+                            end = Offset(x, yLow),
+                            strokeWidth = 1.5.dp.toPx(),
+                            cap = StrokeCap.Round
+                        )
+
+                        val bodyTop = minOf(yOpen, yClose)
+                        val bodyHeight = maxOf(kotlin.math.abs(yClose - yOpen), 3f)
+                        drawRoundRect(
+                            color = color,
+                            topLeft = Offset(x - (candleWidth / 2f), bodyTop),
+                            size = Size(candleWidth, bodyHeight),
+                            cornerRadius = CornerRadius(1.5.dp.toPx(), 1.5.dp.toPx())
+                        )
+                    }
+                } else {
+                    val linePath = Path()
+                    val fillPath = Path()
+                    candles.forEachIndexed { index, c ->
+                        val x = index * candleStep + (candleStep / 2f)
+                        val y = priceToY(c.close)
+                        if (index == 0) {
+                            linePath.moveTo(x, y)
+                            fillPath.moveTo(x, height)
+                            fillPath.lineTo(x, y)
                         } else {
-                            emaPath.lineTo(x, y)
+                            linePath.lineTo(x, y)
+                            fillPath.lineTo(x, y)
                         }
                     }
+                    fillPath.lineTo(width, height)
+                    fillPath.close()
+                    drawPath(
+                        path = fillPath,
+                        brush = Brush.verticalGradient(
+                            colors = listOf(lineCyan.copy(alpha = 0.25f), Color.Transparent)
+                        )
+                    )
+                    drawPath(
+                        path = linePath,
+                        color = lineCyan,
+                        style = Stroke(width = 2.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
                 }
-                drawPath(
-                    path = emaPath,
-                    color = Color(0xFFFFB300),
-                    style = Stroke(width = 2.dp.toPx())
-                )
+
+                // SMA 20 Overlay (Electric Cyan)
+                if (showSma && smaSeries.isNotEmpty()) {
+                    val smaPath = Path()
+                    var started = false
+                    smaSeries.forEachIndexed { i, valSma ->
+                        if (!valSma.isNaN()) {
+                            val x = i * candleStep + (candleStep / 2f)
+                            val y = priceToY(valSma)
+                            if (!started) {
+                                smaPath.moveTo(x, y)
+                                started = true
+                            } else {
+                                smaPath.lineTo(x, y)
+                            }
+                        }
+                    }
+                    drawPath(
+                        path = smaPath,
+                        color = lineCyan,
+                        style = Stroke(width = 1.8.dp.toPx(), cap = StrokeCap.Round)
+                    )
+                }
+
+                // EMA 50 Overlay (Metallic Gold)
+                if (showEma && emaSeries.isNotEmpty()) {
+                    val emaPath = Path()
+                    var started = false
+                    emaSeries.forEachIndexed { i, valEma ->
+                        if (!valEma.isNaN()) {
+                            val x = i * candleStep + (candleStep / 2f)
+                            val y = priceToY(valEma)
+                            if (!started) {
+                                emaPath.moveTo(x, y)
+                                started = true
+                            } else {
+                                emaPath.lineTo(x, y)
+                            }
+                        }
+                    }
+                    drawPath(
+                        path = emaPath,
+                        color = GoldAccentBright,
+                        style = Stroke(width = 1.8.dp.toPx(), cap = StrokeCap.Round)
+                    )
+                }
             }
+
+            // Price Axis Labels
+            Text(
+                text = String.format(Locale.US, "%.4f", maxPrice),
+                color = TextMuted,
+                fontSize = 10.sp,
+                fontFamily = JetBrainsMonoFont,
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
+            Text(
+                text = String.format(Locale.US, "%.4f", minPrice),
+                color = TextMuted,
+                fontSize = 10.sp,
+                fontFamily = JetBrainsMonoFont,
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
         }
-
-        // Price Axis Badges
-        Text(
-            text = String.format("%.4f", maxPrice),
-            color = TextMuted,
-            fontSize = 10.sp,
-            modifier = Modifier.align(Alignment.TopEnd)
-        )
-        Text(
-            text = String.format("%.4f", minPrice),
-            color = TextMuted,
-            fontSize = 10.sp,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
     }
 }

@@ -1,8 +1,8 @@
 package com.pipbeacon.app.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,21 +20,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,36 +41,32 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.pipbeacon.app.core.SignalType
 import com.pipbeacon.app.data.SignalItem
-import com.pipbeacon.app.ui.components.SignalBadge
+import com.pipbeacon.app.ui.components.ShowcaseBackground
+import com.pipbeacon.app.ui.components.ShowcaseCandlestickStrip
+import com.pipbeacon.app.ui.components.ShowcaseGoldButton
+import com.pipbeacon.app.ui.theme.CyanAccent
 import com.pipbeacon.app.ui.theme.GoldAccent
 import com.pipbeacon.app.ui.theme.GoldAccentBright
 import com.pipbeacon.app.ui.theme.IndicatorBuy
 import com.pipbeacon.app.ui.theme.IndicatorBuyBackground
-import com.pipbeacon.app.ui.theme.IndicatorNeutral
 import com.pipbeacon.app.ui.theme.IndicatorSell
 import com.pipbeacon.app.ui.theme.IndicatorSellBackground
+import com.pipbeacon.app.ui.theme.JetBrainsMonoFont
 import com.pipbeacon.app.ui.theme.NavyBackground
 import com.pipbeacon.app.ui.theme.NavyBorder
 import com.pipbeacon.app.ui.theme.NavyCard
 import com.pipbeacon.app.ui.theme.NavyCardElevated
-import com.pipbeacon.app.ui.theme.NavySurface
 import com.pipbeacon.app.ui.theme.NavySurfaceVariant
-import com.pipbeacon.app.ui.theme.TealAccent
 import com.pipbeacon.app.ui.theme.TextMuted
 import com.pipbeacon.app.ui.theme.TextPrimary
 import com.pipbeacon.app.ui.theme.TextSecondary
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 @Composable
 fun SignalDetailScreen(
@@ -89,510 +77,322 @@ fun SignalDetailScreen(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val isBuy = signal.isBuy
     val isClosed = signal.isClosed
+    val directionColor = if (isBuy) IndicatorBuy else IndicatorSell
+    val directionBg = if (isBuy) IndicatorBuyBackground else IndicatorSellBackground
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(NavyBackground)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-            .testTag("signal_detail_screen")
-    ) {
-        // Top Nav Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    ShowcaseBackground(modifier = Modifier.testTag("signal_detail_screen")) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
         ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.size(36.dp)
+            // Top Nav Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = TextPrimary
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Signal Details",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Badges Row: BUY/SELL + Timeframe + Confidence + Status
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // BUY/SELL Badge
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (isBuy) IndicatorBuy else IndicatorSell)
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack, modifier = Modifier.size(36.dp)) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                            contentDescription = null,
-                            tint = Color.Black,
-                            modifier = Modifier.size(13.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (isBuy) "BUY" else "SELL",
-                            color = Color.Black,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.ExtraBold
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = TextPrimary
                         )
                     }
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Timeframe Badge
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF1E2433))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "⏱ ${signal.timeFrame.label}",
-                        color = TextSecondary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
+                        text = "Signal Details",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
                     )
                 }
-            }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Confidence Pill
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF2C220E))
-                        .border(1.dp, GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(NavyCard)
+                        .border(1.dp, NavyBorder, RoundedCornerShape(12.dp))
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "🎯 ${signal.confidencePercent}%",
+                        text = if (isClosed) "Closed" else "${signal.timeFrame.label} • ${signal.confidencePercent}%",
                         color = GoldAccentBright,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // Status Pill
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF222838))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(if (isClosed) TextMuted else IndicatorBuy)
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = if (isClosed) "Closed" else "Live",
-                            color = if (isClosed) TextSecondary else IndicatorBuy,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-        // Milestone Card (e.g. "Take Profit 2 Reached - Stop loss at breakeven")
-        val milestoneText = signal.tpReachedNote ?: if (signal.tpsHitCount >= 2) {
-            "Take Profit 2 Reached\nStop loss at breakeven"
-        } else if (signal.tpsHitCount == 1) {
-            "Take Profit 1 Reached\nSecured 50% profits"
-        } else {
-            "Signal Active\nWaiting for Target 1 progression"
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(IndicatorBuyBackground)
-                .border(1.dp, IndicatorBuy.copy(alpha = 0.45f), RoundedCornerShape(14.dp))
-                .padding(14.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(IndicatorBuy.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = IndicatorBuy,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
-                    Text(
-                        text = if (signal.tpsHitCount >= 2) "Take Profit 2 Reached" else if (signal.tpsHitCount == 1) "Take Profit 1 Reached" else "Signal Active",
-                        color = IndicatorBuy,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 15.sp
-                    )
-                    Text(
-                        text = if (signal.isBreakevenActive) "Stop loss at breakeven" else "Tracking live order parameters",
-                        color = TextSecondary,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // Take Profit Progress Stepper
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(NavyCard)
-                .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
-                .padding(16.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.TrackChanges,
-                        contentDescription = null,
-                        tint = GoldAccentBright,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Take Profit Progress",
-                        color = TextPrimary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Connected Stepper Row: TP1 ── TP2 ── TP3
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Node 1: TP1
-                    StepperNode(
-                        stepNumber = 1,
-                        label = "TP1",
-                        isCompleted = signal.tpsHitCount >= 1
-                    )
-
-                    // Connecting Line 1
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(2.dp)
-                            .background(if (signal.tpsHitCount >= 1) IndicatorBuy else NavyBorder)
-                    )
-
-                    // Node 2: TP2
-                    StepperNode(
-                        stepNumber = 2,
-                        label = "TP2",
-                        isCompleted = signal.tpsHitCount >= 2
-                    )
-
-                    // Connecting Line 2
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(2.dp)
-                            .background(if (signal.tpsHitCount >= 2) IndicatorBuy else NavyBorder)
-                    )
-
-                    // Node 3: TP3
-                    StepperNode(
-                        stepNumber = 3,
-                        label = "TP3",
-                        isCompleted = signal.tpsHitCount >= 3
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // Trade Parameters Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(NavyCard)
-                .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
-                .padding(16.dp)
-        ) {
-            Column {
+            // Centered Showcase Header Pill: "BUY Signal - EUR/USD"
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(directionBg)
+                    .border(1.dp, directionColor.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                    .padding(horizontal = 16.dp, vertical = 7.dp)
+            ) {
                 Text(
-                    text = "Trade Parameters",
-                    color = TextPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "${if (isBuy) "BUY" else "SELL"} Signal - ${signal.symbol}",
+                    color = directionColor,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
+            }
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                // Entry Price Card
-                Box(
+            // Candlestick Preview Chart Container
+            Surface(
+                color = NavySurfaceVariant,
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, NavyBorder),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ShowcaseCandlestickStrip(
+                    isBullishBias = isBuy,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(NavySurfaceVariant)
-                        .padding(12.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(NavyCardElevated),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("➔", color = TextSecondary, fontSize = 13.sp)
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text("Entry Price", color = TextMuted, fontSize = 10.sp)
-                            Text(
-                                text = formatPrice(signal.entryPrice),
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        }
+                        .height(128.dp)
+                        .padding(10.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Milestone Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(IndicatorBuyBackground)
+                    .border(1.dp, IndicatorBuy.copy(alpha = 0.45f), RoundedCornerShape(14.dp))
+                    .padding(14.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(IndicatorBuy.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = IndicatorBuy,
+                            modifier = Modifier.size(19.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = if (signal.tpsHitCount >= 2) "Take Profit 2 Reached"
+                            else if (signal.tpsHitCount == 1) "Take Profit 1 Reached"
+                            else "Signal Active",
+                            color = IndicatorBuy,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = if (signal.isBreakevenActive) "Stop loss at breakeven" else "Educational setup with structured TP & SL levels",
+                            color = TextSecondary,
+                            fontSize = 11.sp
+                        )
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                // Stop Loss Card with B.E. Active badge
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF1A1116))
-                        .border(1.dp, Color(0xFF4A1A22), RoundedCornerShape(10.dp))
-                        .padding(12.dp)
-                ) {
+            // Take Profit Stepper
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(NavyCard)
+                    .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
+                    .padding(14.dp)
+            ) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.TrackChanges, contentDescription = null, tint = GoldAccentBright, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Take Profit Progress",
+                            color = TextPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(IndicatorSell.copy(alpha = 0.2f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("⊘", color = IndicatorSell, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text("Stop Loss", color = IndicatorSell, fontSize = 10.sp)
-                                Text(
-                                    text = formatPrice(signal.stopLoss),
-                                    color = IndicatorSell,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-                            }
-                        }
-
-                        if (signal.isBreakevenActive) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(Color(0xFF332008))
-                                    .border(1.dp, GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = "B.E. Active",
-                                    color = GoldAccentBright,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
+                        StepperNode(stepNumber = 1, label = "TP1", isCompleted = signal.tpsHitCount >= 1)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(2.dp)
+                                .background(if (signal.tpsHitCount >= 1) IndicatorBuy else NavyBorder)
+                        )
+                        StepperNode(stepNumber = 2, label = "TP2", isCompleted = signal.tpsHitCount >= 2)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(2.dp)
+                                .background(if (signal.tpsHitCount >= 2) IndicatorBuy else NavyBorder)
+                        )
+                        StepperNode(stepNumber = 3, label = "TP3", isCompleted = signal.tpsHitCount >= 3)
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                // Take Profit Boxes: TP1, TP2, TP3
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // TP1 Box
-                    TpTargetBox(
-                        label = "TP1",
-                        price = formatPrice(signal.takeProfit1),
-                        isHit = signal.tpsHitCount >= 1,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    // TP2 Box
-                    TpTargetBox(
-                        label = "TP2",
-                        price = formatPrice(signal.takeProfit2),
-                        isHit = signal.tpsHitCount >= 2,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    // TP3 Box
-                    signal.takeProfit3?.let { tp3 ->
-                        TpTargetBox(
-                            label = "TP3",
-                            price = formatPrice(tp3),
-                            isHit = signal.tpsHitCount >= 3,
-                            modifier = Modifier.weight(1f)
+            // Entry, Take Profit, Stop Loss Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(NavyCard)
+                    .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
+                    .padding(16.dp)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Entry:", color = TextSecondary, fontSize = 13.sp)
+                        Text(
+                            text = formatPrice(signal.entryPrice),
+                            color = TextPrimary,
+                            fontFamily = JetBrainsMonoFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
                         )
                     }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // Notes & Indicator Confluence
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(NavyCard)
-                .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
-                .padding(16.dp)
-        ) {
-            Column {
-                Text(
-                    text = "Notes",
-                    color = TextPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = signal.indicatorReasoning,
-                    color = TextSecondary,
-                    fontSize = 12.sp,
-                    lineHeight = 18.sp
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Strategy: ${signal.strategyVersion}",
-                        color = TextMuted,
-                        fontSize = 10.sp
-                    )
-                    Text(
-                        text = "Risk/Reward: ${signal.riskRewardRatio}",
-                        color = GoldAccentBright,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Bottom Action Buttons: Copy & Chart
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Button(
-                onClick = {
-                    val copyText = buildString {
-                        appendLine("[PipBeacon Signal: ${signal.symbol}]")
-                        appendLine("Direction: ${if (isBuy) "BUY" else "SELL"}")
-                        appendLine("Timeframe: ${signal.timeFrame.label}")
-                        appendLine("Entry: ${formatPrice(signal.entryPrice)}")
-                        appendLine("Stop Loss: ${formatPrice(signal.stopLoss)}")
-                        appendLine("TP1: ${formatPrice(signal.takeProfit1)}")
-                        appendLine("TP2: ${formatPrice(signal.takeProfit2)}")
-                        if (signal.takeProfit3 != null) {
-                            appendLine("TP3: ${formatPrice(signal.takeProfit3)}")
-                        }
-                        appendLine("Risk / Reward: ${signal.riskRewardRatio}")
-                        appendLine("Rationale: ${signal.indicatorReasoning}")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Take Profit:", color = TextSecondary, fontSize = 13.sp)
+                        Text(
+                            text = formatPrice(signal.takeProfit1),
+                            color = IndicatorBuy,
+                            fontFamily = JetBrainsMonoFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
                     }
-                    clipboardManager.setText(AnnotatedString(copyText))
-                },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E2433)),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ContentCopy,
-                    contentDescription = null,
-                    tint = TextPrimary,
-                    modifier = Modifier.size(15.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Copy Setup", color = TextPrimary, fontSize = 12.sp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Stop Loss:", color = TextSecondary, fontSize = 13.sp)
+                        Text(
+                            text = formatPrice(signal.stopLoss),
+                            color = IndicatorSell,
+                            fontFamily = JetBrainsMonoFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TpTargetBox("TP1", formatPrice(signal.takeProfit1), signal.tpsHitCount >= 1, Modifier.weight(1f))
+                        TpTargetBox("TP2", formatPrice(signal.takeProfit2), signal.tpsHitCount >= 2, Modifier.weight(1f))
+                        signal.takeProfit3?.let { tp3 ->
+                            TpTargetBox("TP3", formatPrice(tp3), signal.tpsHitCount >= 3, Modifier.weight(1f))
+                        }
+                    }
+                }
             }
 
-            Button(
-                onClick = { onAnalyzeSymbol(signal.symbol) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = GoldAccentBright),
-                shape = RoundedCornerShape(10.dp)
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Analysis Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(NavyCard)
+                    .border(1.dp, NavyBorder, RoundedCornerShape(14.dp))
+                    .padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.QueryStats,
-                    contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier.size(15.dp)
+                Column {
+                    Text(
+                        text = "Analysis",
+                        color = TextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = signal.indicatorReasoning,
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Strategy: ${signal.strategyVersion}", color = TextMuted, fontSize = 10.sp)
+                        Text("R:R ${signal.riskRewardRatio}", color = GoldAccentBright, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Button(
+                    onClick = {
+                        val copyText = buildString {
+                            appendLine("[PipBeacon Signal: ${signal.symbol}]")
+                            appendLine("Direction: ${if (isBuy) "BUY" else "SELL"}")
+                            appendLine("Entry: ${formatPrice(signal.entryPrice)}")
+                            appendLine("Stop Loss: ${formatPrice(signal.stopLoss)}")
+                            appendLine("TP1: ${formatPrice(signal.takeProfit1)}")
+                            appendLine("TP2: ${formatPrice(signal.takeProfit2)}")
+                            signal.takeProfit3?.let { appendLine("TP3: ${formatPrice(it)}") }
+                        }
+                        clipboardManager.setText(AnnotatedString(copyText))
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = NavyCardElevated),
+                    border = BorderStroke(1.dp, NavyBorder),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(15.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Copy Setup", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+
+                ShowcaseGoldButton(
+                    text = "Analyze Chart",
+                    onClick = { onAnalyzeSymbol(signal.symbol) },
+                    height = 48.dp,
+                    modifier = Modifier.weight(1.2f)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Analyze Chart", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 12.sp)
             }
         }
     }
@@ -609,14 +409,14 @@ private fun StepperNode(
             modifier = Modifier
                 .size(28.dp)
                 .clip(CircleShape)
-                .background(if (isCompleted) IndicatorBuy else Color(0xFF202738)),
+                .background(if (isCompleted) IndicatorBuy else NavySurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             if (isCompleted) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
-                    tint = Color.Black,
+                    tint = Color(0xFF060D1A),
                     modifier = Modifier.size(14.dp)
                 )
             } else {
@@ -647,39 +447,29 @@ private fun TpTargetBox(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(if (isHit) IndicatorBuyBackground else NavySurfaceVariant)
             .border(
                 1.dp,
                 if (isHit) IndicatorBuy.copy(alpha = 0.5f) else NavyBorder,
-                RoundedCornerShape(8.dp)
+                RoundedCornerShape(10.dp)
             )
             .padding(vertical = 8.dp, horizontal = 6.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = label,
-                    color = if (isHit) IndicatorBuy else TextMuted,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                if (isHit) {
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = IndicatorBuy,
-                        modifier = Modifier.size(10.dp)
-                    )
-                }
-            }
+            Text(
+                text = if (isHit) "$label ✓" else label,
+                color = if (isHit) IndicatorBuy else TextMuted,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = price,
                 color = if (isHit) IndicatorBuy else TextPrimary,
+                fontFamily = JetBrainsMonoFont,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -698,8 +488,8 @@ fun SignalDetailDialog(
         Surface(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
-                .clip(RoundedCornerShape(16.dp))
-                .border(1.dp, NavyBorder, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(18.dp))
+                .border(1.dp, NavyBorder, RoundedCornerShape(18.dp))
                 .testTag("signal_detail_dialog"),
             color = NavyBackground
         ) {
@@ -717,11 +507,9 @@ fun SignalDetailDialog(
 
 private fun formatPrice(price: Double?): String {
     if (price == null) return "--"
-    return if (price >= 1000.0) {
-        String.format(Locale.US, "%,.0f", price)
-    } else if (price >= 100.0) {
-        String.format(Locale.US, "%.2f", price)
-    } else {
-        String.format(Locale.US, "%.4f", price)
+    return when {
+        price >= 1000.0 -> String.format(Locale.US, "%,.0f", price)
+        price >= 100.0 -> String.format(Locale.US, "%.2f", price)
+        else -> String.format(Locale.US, "%.4f", price)
     }
 }
